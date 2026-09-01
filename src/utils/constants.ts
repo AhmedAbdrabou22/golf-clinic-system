@@ -107,3 +107,10 @@ export const ITEM_TYPES: { value: string; label: string; hint: string }[] = [
     hint: "مستهلكات وحقن تُستخدم داخل الجلسات، سعر البيع 0 دائمًا",
   },
 ];
+
+
+export const SERVICE_TYPES = [
+  { value: "consultation", label: "كشف" },
+  { value: "device", label: "جهاز" },
+  { value: "session", label: "جلسة" },
+];

@@ -1,5 +1,7 @@
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import DataTable, { Column } from "@/components/shared/DataTable";
+import StatusBadge from "@/components/shared/StatusBadge";
+import { SERVICE_TYPES, labelOf } from "@/utils/constants";
 import type { Service } from "@/types";
 
 interface Props {
@@ -9,10 +11,22 @@ interface Props {
   onDelete: (s: Service) => void;
 }
 
+const typeTone: Record<string, string> = {
+  consultation: "primary",
+  device: "amber",
+  session: "coral",
+};
+
 const ServicesTable = ({ services, isLoading, onEdit, onDelete }: Props) => {
   const columns: Column<Service>[] = [
     { header: "#", accessor: (r) => r.id },
     { header: "اسم الخدمة", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
+    {
+      header: "النوع",
+      accessor: (r) => (
+        <StatusBadge label={labelOf(SERVICE_TYPES, r.type)} tone={typeTone[r.type] ?? "gray"} />
+      ),
+    },
     { header: "القسم", accessor: (r) => r.department?.name ?? "—" },
     {
       header: "السعر",

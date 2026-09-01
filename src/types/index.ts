@@ -240,3 +240,23 @@ export interface PaginatedResponse<T> {
   // links?: PaginationLinks;
   // meta?: PaginationMeta;
 }
+
+
+export type ServiceType = "consultation" | "device" | "session";
+
+export interface ServiceItem {
+  item_id: number;
+  quantity: number;
+  item?: Item;
+}
+
+export interface Service {
+  id: number;
+  name: string;
+  price: number;
+  department_id: number;
+  department?: Department;
+  type: ServiceType;
+  // مطلوبة فقط لو النوع "session" — الأصناف المستهلكة داخل الجلسة
+  items?: ServiceItem[];
+}
