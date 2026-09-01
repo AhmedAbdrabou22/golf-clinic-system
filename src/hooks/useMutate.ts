@@ -61,9 +61,7 @@ export function useMutate<TResponse = unknown>({
 
         return axios({
           method: method.toUpperCase(),
-          // url: buildUrl(url),
-            url: `https://clinic.codingcut.com/api/v1/`,
-
+          url: buildUrl(url),
           data: payload,
           responseType,
           headers: getHeaders(),

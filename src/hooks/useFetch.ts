@@ -9,7 +9,7 @@ export const BASE_URL: string =
   import.meta.env.VITE_API_BASE_URL ?? "https://clinic.codingcut.com/api/v1/";
 
 export const buildUrl = (endpoint: string) =>
-  `${BASE_URL.replace(/\/$/, "")}/${endpoint.replace(/^\//, "")}`;
+  `https://clinic.codingcut.com/api/v1/${endpoint.replace(/^\//, "")}`;
 
 // 2️⃣ تعريف نوع الـ props
 type UseFetchProps<T> = {
@@ -56,8 +56,7 @@ function useFetch<T = any>({
     queryKey: [...queryKey, params],
     queryFn: async () => {
       try {
-        // const res = await axios.get(buildUrl(endpoint), config);
-        const res = await axios.get(`https://clinic.codingcut.com/api/v1/`, config);
+        const res = await axios.get(buildUrl(endpoint), config);
         const data = res.data;
         onSuccess?.(data);
         return data;
