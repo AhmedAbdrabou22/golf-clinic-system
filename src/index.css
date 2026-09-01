@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    background-color: theme("colors.paper");
+    color: theme("colors.ink");
+  }
+  body {
+    font-family: theme("fontFamily.body");
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: theme("fontFamily.display");
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: theme("colors.primary.200") transparent;
+  }
+  :focus-visible {
+    outline: 2px solid theme("colors.primary.500");
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-bold transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98];
+  }
+  .btn-primary {
+    @apply btn bg-primary-500 text-white shadow-card hover:bg-primary-600;
+  }
+  .btn-secondary {
+    @apply btn bg-white text-ink border border-ink/10 hover:bg-mint-100;
+  }
+  .btn-danger {
+    @apply btn bg-coral-500 text-white hover:bg-coral-600;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-primary-600 hover:bg-primary-50;
+  }
+
+  .card {
+    @apply bg-white rounded-xl2 shadow-card border border-ink/5;
+  }
+
+  .field-label {
+    @apply block text-sm font-bold text-ink/80 mb-1.5;
+  }
+  .field-input {
+    @apply w-full rounded-lg border border-ink/15 bg-white px-3.5 py-2.5 text-sm text-ink placeholder:text-ink/35 outline-none transition focus:border-primary-500 focus:ring-2 focus:ring-primary-100;
+  }
+  .field-error {
+    @apply mt-1 text-xs font-bold text-coral-600;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold;
+  }
+
+  .table-wrap {
+    @apply overflow-x-auto rounded-xl2 border border-ink/10;
+  }
+  table.data-table {
+    @apply w-full border-collapse text-sm;
+  }
+  table.data-table thead th {
+    @apply bg-primary-700 text-white text-xs font-bold px-4 py-3 text-start whitespace-nowrap;
+  }
+  table.data-table tbody td {
+    @apply px-4 py-3 text-ink/80 border-b border-ink/5 whitespace-nowrap;
+  }
+  table.data-table tbody tr:hover {
+    @apply bg-mint-100/60;
+  }
+}
+
+/* heartbeat / pulse motif — the app's signature line */
+.pulse-line {
+  height: 34px;
+  width: 100%;
+}
