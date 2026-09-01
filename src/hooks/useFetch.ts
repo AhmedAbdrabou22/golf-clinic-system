@@ -5,11 +5,10 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 // 1️⃣ Base URL من environment variable (Vite)
-export const BASE_URL: string =
-  import.meta.env.VITE_API_BASE_URL ?? "https://clinic.codingcut.com/api/v1";
+export const BASE_URL: string =https://clinic.codingcut.com/api/v1;
 
 export const buildUrl = (endpoint: string) =>
-  `https://clinic.codingcut.com/api/v1`;
+  `https://clinic.codingcut.com/api/v1/`;
 
 // 2️⃣ تعريف نوع الـ props
 type UseFetchProps<T> = {
