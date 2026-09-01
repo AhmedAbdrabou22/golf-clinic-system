@@ -56,7 +56,8 @@ function useFetch<T = any>({
     queryKey: [...queryKey, params],
     queryFn: async () => {
       try {
-        const res = await axios.get(buildUrl(endpoint), config);
+        // const res = await axios.get(buildUrl(endpoint), config);
+        const res = await axios.get(`https://clinic.codingcut.com/api/v1/`, config);
         const data = res.data;
         onSuccess?.(data);
         return data;
