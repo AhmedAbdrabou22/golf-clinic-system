@@ -14,11 +14,16 @@ interface Props {
 const AppointmentsTable = ({ appointments, isLoading, onEdit, onDelete }: Props) => {
   const columns: Column<Appointment>[] = [
     { header: "#", accessor: (r) => r.id },
-    { header: "المريض", accessor: (r) => <span className="font-bold text-ink">{r.patient?.name ?? `#${r.patient_id}`}</span> },
-    { header: "الطبيب", accessor: (r) => r.doctor?.name ?? `#${r.doctor_id}` },
-    { header: "الخدمة", accessor: (r) => r.service?.name ?? "—" },
+    {
+      header: "المريض",
+      accessor: (r) => (
+        <span className="font-bold text-ink">{r.patient?.name ?? `#${r.patient_id}`}</span>
+      ),
+    },
+    { header: "الطبيب", accessor: (r) => r.doctor_name ?? r.doctor?.name ?? `#${r.doctor_id}` },
+    { header: "الخدمة", accessor: (r) => r.service_name ?? r.service?.name ?? "—" },
     { header: "نوع الزيارة", accessor: (r) => labelOf(VISIT_TYPES, r.visit_type) },
-    { header: "الموعد", accessor: (r) => r.appointment_date },
+    { header: "الموعد", accessor: (r) => r.appointment_date?.split("T")[0] },
     { header: "الحالة", accessor: (r) => <AppointmentStatusMenu appointment={r} /> },
     {
       header: "إجراءات",

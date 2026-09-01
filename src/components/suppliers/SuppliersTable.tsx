@@ -14,7 +14,7 @@ const SuppliersTable = ({ suppliers, isLoading, onEdit, onDelete }: Props) => {
     { header: "#", accessor: (r) => r.id },
     { header: "اسم المورد", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
     { header: "الهاتف", accessor: (r) => <span dir="ltr">{r.phone ?? "—"}</span> },
-    { header: "العنوان", accessor: (r) => r.address ?? "—" },
+    // { header: "العنوان", accessor: (r) => r.address ?? "—" },
     {
       header: "إجراءات",
       accessor: (r) => (

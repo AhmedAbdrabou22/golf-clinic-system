@@ -80,13 +80,27 @@ export interface Supplier {
   address?: string;
 }
 
+export type ItemUnit =
+  | "ml"
+  | "half_ml"
+  | "gram"
+  | "half_gram"
+  | "piece"
+  | "strip"
+  | "box"
+  | "vial";
+
+export type ItemType = "consumable" | "retailable";
+
 export interface Item {
   id: number;
   name: string;
+  unit: ItemUnit;
+  type: ItemType;
   current_stock: number;
   selling_price: number;
   purchase_price?: number;
-  unit?: string;
+  is_active: boolean;
 }
 
 export interface PurchaseInvoiceItem {
@@ -126,12 +140,26 @@ export interface Appointment {
   patient?: Patient;
   doctor_id: number;
   doctor?: Staff;
+  doctor_name?: string;
   service_id: number;
   service?: Service;
+  service_name?: string;
   appointment_date: string;
   visit_type: VisitType;
   status: AppointmentStatus;
+  shift_id?: number;
+  shift?: {
+    id: number;
+    status?: "open" | "closed";
+    initial_balance?: string | number;
+    final_balance?: string | number | null;
+    start_time?: string;
+    end_time?: string | null;
+  };
   notes?: string;
+  created_by?: number;
+  creator_name?: string;
+  created_at?: string;
 }
 
 // ==================== الشفتات ====================
@@ -183,4 +211,32 @@ export interface Invoice {
   status?: "paid" | "refunded" | "partial_refund";
   items: InvoiceItem[];
   created_at?: string;
+}
+
+
+
+export interface PaginationMeta {
+  current_page: number;
+  last_page: number;
+  total: number;
+  per_page: number;
+  from?: number | null;
+  to?: number | null;
+  path?: string;
+}
+
+export interface PaginationLinks {
+  first?: string | null;
+  last?: string | null;
+  prev?: string | null;
+  next?: string | null;
+}
+
+export interface PaginatedResponse<T> {
+  status?: number | boolean;
+  message?: string;
+  errors?: any;
+  data: T[];
+  // links?: PaginationLinks;
+  // meta?: PaginationMeta;
 }

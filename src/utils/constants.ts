@@ -81,3 +81,29 @@ export const labelOf = (
   list: { value: string; label: string }[],
   value?: string | null
 ) => list.find((i) => i.value === value)?.label ?? value ?? "—";
+
+
+
+export const ITEM_UNITS = [
+  { value: "ml", label: "مللي" },
+  { value: "half_ml", label: "نص مللي" },
+  { value: "gram", label: "جرام" },
+  { value: "half_gram", label: "نص جرام" },
+  { value: "piece", label: "عدد / قطعة" },
+  { value: "strip", label: "شريط" },
+  { value: "box", label: "علبة" },
+  { value: "vial", label: "فايل (أمبول / زجاجة ميزو)" },
+];
+
+export const ITEM_TYPES: { value: string; label: string; hint: string }[] = [
+  {
+    value: "retailable",
+    label: "منتج بيع مباشر",
+    hint: "منتجات صيدلية وتجزئة، لها سعر بيع مباشر",
+  },
+  {
+    value: "consumable",
+    label: "مستهلك طبي",
+    hint: "مستهلكات وحقن تُستخدم داخل الجلسات، سعر البيع 0 دائمًا",
+  },
+];

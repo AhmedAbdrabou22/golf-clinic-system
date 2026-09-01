@@ -1,6 +1,7 @@
 import { FiEdit2, FiTrash2 } from "react-icons/fi";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import StatusBadge from "@/components/shared/StatusBadge";
+import { ITEM_UNITS, ITEM_TYPES, labelOf } from "@/utils/constants";
 import type { Item } from "@/types";
 
 interface Props {
@@ -15,6 +16,16 @@ const ItemsTable = ({ items, isLoading, onEdit, onDelete }: Props) => {
     { header: "#", accessor: (r) => r.id },
     { header: "اسم الصنف", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
     {
+      header: "النوع",
+      accessor: (r) => (
+        <StatusBadge
+          label={labelOf(ITEM_TYPES, r.type)}
+          tone={r.type === "consumable" ? "amber" : "primary"}
+        />
+      ),
+    },
+    { header: "الوحدة", accessor: (r) => labelOf(ITEM_UNITS, r.unit) },
+    {
       header: "الكمية بالمخزن",
       accessor: (r) =>
         r.current_stock <= 5 ? (
@@ -25,7 +36,21 @@ const ItemsTable = ({ items, isLoading, onEdit, onDelete }: Props) => {
     },
     {
       header: "سعر البيع",
-      accessor: (r) => <span className="font-bold text-primary-600">{r.selling_price} ج.م</span>,
+      accessor: (r) =>
+        r.type === "consumable" ? (
+          <span className="text-ink/40">— يُباع ضمن الجلسات</span>
+        ) : (
+          <span className="font-bold text-primary-600">{r.selling_price} ج.م</span>
+        ),
+    },
+    {
+      header: "الحالة",
+      accessor: (r) =>
+        r.is_active ? (
+          <StatusBadge label="مفعّل" tone="primary" />
+        ) : (
+          <StatusBadge label="غير مفعّل" tone="gray" />
+        ),
     },
     {
       header: "إجراءات",
