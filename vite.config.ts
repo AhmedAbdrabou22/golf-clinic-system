@@ -11,5 +11,13 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'https://clinic.codingcut.com',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '/api/v1')
+      }
+    }
   },
 });

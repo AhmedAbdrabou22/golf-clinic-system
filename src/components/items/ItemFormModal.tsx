@@ -14,6 +14,8 @@ interface Props {
 const emptyForm = {
   name: "",
   unit: "" as ItemUnit | "",
+  stock_unit: "" as ItemUnit | "",
+  conversion_factor: "1",
   type: "retailable" as ItemType,
   current_stock: "",
   selling_price: "",
@@ -29,6 +31,9 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
       setForm({
         name: item?.name ?? "",
         unit: item?.unit ?? "",
+        stock_unit: item?.stock_unit ?? "",
+        conversion_factor:
+          item?.conversion_factor != null ? String(item.conversion_factor) : "1",
         type: item?.type ?? "retailable",
         current_stock: item?.current_stock != null ? String(item.current_stock) : "",
         selling_price: item?.selling_price != null ? String(item.selling_price) : "",
@@ -53,6 +58,8 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
     const payload: Record<string, any> = {
       name: form.name,
       unit: form.unit,
+      stock_unit: form.stock_unit,
+      conversion_factor: Number(form.conversion_factor || 1),
       type: form.type,
       // المستهلكات الطبية سعر بيعها دايمًا صفر لأنها بتتباع جوه الجلسات مش لوحدها
       selling_price: isConsumable ? 0 : Number(form.selling_price || 0),
@@ -73,7 +80,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
           required
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="مثال: بانادول اكسترا"
+          placeholder="مثال: ميزو 5 مل"
         />
 
         <SelectField
@@ -94,13 +101,35 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
           {ITEM_TYPES.find((t) => t.value === form.type)?.hint}
         </p>
 
-        <SelectField
-          label="وحدة القياس"
-          name="unit"
+        <div className="grid grid-cols-2 gap-3">
+          <SelectField
+            label="وحدة البيع/العرض"
+            name="unit"
+            required
+            value={form.unit}
+            onChange={(e) => setForm({ ...form, unit: e.target.value as ItemUnit })}
+            options={ITEM_UNITS}
+          />
+          <SelectField
+            label="وحدة التخزين بالمخزن"
+            name="stock_unit"
+            required
+            value={form.stock_unit}
+            onChange={(e) => setForm({ ...form, stock_unit: e.target.value as ItemUnit })}
+            options={ITEM_UNITS}
+          />
+        </div>
+
+        <TextField
+          label="معامل التحويل"
+          name="conversion_factor"
+          type="number"
+          min={0}
+          step="0.01"
           required
-          value={form.unit}
-          onChange={(e) => setForm({ ...form, unit: e.target.value as ItemUnit })}
-          options={ITEM_UNITS}
+          value={form.conversion_factor}
+          onChange={(e) => setForm({ ...form, conversion_factor: e.target.value })}
+          hint="كام وحدة تخزين تعادل وحدة البيع الواحدة؟ مثال: فايل واحد = 5 مللي → 5"
         />
 
         {!isEdit && (

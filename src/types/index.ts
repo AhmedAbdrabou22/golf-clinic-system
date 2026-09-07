@@ -80,15 +80,8 @@ export interface Supplier {
   address?: string;
 }
 
-export type ItemUnit =
-  | "ml"
-  | "half_ml"
-  | "gram"
-  | "half_gram"
-  | "piece"
-  | "strip"
-  | "box"
-  | "vial";
+export type ItemUnit = "ml" | "gram" | "piece" | "strip" | "box" | "vial";
+
 
 export type ItemType = "consumable" | "retailable";
 
@@ -96,6 +89,8 @@ export interface Item {
   id: number;
   name: string;
   unit: ItemUnit;
+  stock_unit: ItemUnit;
+  conversion_factor: number;
   type: ItemType;
   current_stock: number;
   selling_price: number;

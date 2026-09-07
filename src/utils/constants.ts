@@ -86,9 +86,7 @@ export const labelOf = (
 
 export const ITEM_UNITS = [
   { value: "ml", label: "مللي" },
-  { value: "half_ml", label: "نص مللي" },
   { value: "gram", label: "جرام" },
-  { value: "half_gram", label: "نص جرام" },
   { value: "piece", label: "عدد / قطعة" },
   { value: "strip", label: "شريط" },
   { value: "box", label: "علبة" },
