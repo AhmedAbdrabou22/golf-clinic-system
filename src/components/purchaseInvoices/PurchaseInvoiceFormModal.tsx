@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { FiPlus, FiTrash2 } from "react-icons/fi";
+import { FiPlus, FiTrash2, FiInfo } from "react-icons/fi";
 import Modal from "@/components/shared/Modal";
 import { SelectField, TextField } from "@/components/shared/FormField";
 import useFetch from "@/hooks/useFetch";
 import useMutate from "@/hooks/useMutate";
+import { ITEM_UNITS, labelOf } from "@/utils/constants";
 import type { Item, PurchaseInvoiceItem, Supplier } from "@/types";
 
 interface Props {
@@ -56,6 +57,8 @@ const PurchaseInvoiceFormModal = ({ open, onClose }: Props) => {
 
   const total = rows.reduce((s, r) => s + (r.quantity || 0) * (r.purchase_price || 0), 0);
 
+  const findItem = (id: number) => items.find((it: Item) => it.id === id);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutate({
@@ -91,50 +94,81 @@ const PurchaseInvoiceFormModal = ({ open, onClose }: Props) => {
           </div>
 
           <div className="flex flex-col gap-3">
-            {rows.map((row, idx) => (
-              <div key={idx} className="grid grid-cols-12 items-end gap-2 rounded-lg border border-ink/10 p-3">
-                <div className="col-span-12 sm:col-span-5">
-                  <SelectField
-                    label="الصنف"
-                    name={`item_${idx}`}
-                    value={row.item_id || ""}
-                    onChange={(e) => updateRow(idx, { item_id: Number(e.target.value) })}
-                    options={items.map((it: Item) => ({ value: it.id, label: it.name }))}
-                  />
+            {rows.map((row, idx) => {
+              const selectedItem = findItem(row.item_id);
+              return (
+                <div key={idx} className="rounded-lg border border-ink/10 p-3">
+                  <div className="grid grid-cols-12 items-end gap-2">
+                    <div className="col-span-12 sm:col-span-5">
+                      <SelectField
+                        label="الصنف"
+                        name={`item_${idx}`}
+                        value={row.item_id || ""}
+                        onChange={(e) => updateRow(idx, { item_id: Number(e.target.value) })}
+                        options={items.map((it: Item) => ({ value: it.id, label: it.name }))}
+                      />
+                    </div>
+                    <div className="col-span-5 sm:col-span-3">
+                      <TextField
+                        label="الكمية"
+                        name={`qty_${idx}`}
+                        type="number"
+                        min={1}
+                        value={row.quantity}
+                        onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
+                      />
+                    </div>
+                    <div className="col-span-5 sm:col-span-3">
+                      <TextField
+                        label="سعر الشراء"
+                        name={`price_${idx}`}
+                        type="number"
+                        min={0}
+                        value={row.purchase_price}
+                        onChange={(e) => updateRow(idx, { purchase_price: Number(e.target.value) })}
+                      />
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <button
+                        type="button"
+                        onClick={() => removeRow(idx)}
+                        disabled={rows.length === 1}
+                        className="rounded-lg p-2.5 text-coral-500 hover:bg-coral-500/10 disabled:opacity-30"
+                        aria-label="حذف الصف"
+                      >
+                        <FiTrash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* معلومات توضيحية عن الصنف المختار: الوحدة، وحدة التخزين، ومعامل التحويل */}
+                  {selectedItem && (
+                    <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-lg bg-mint-100/70 px-3 py-2 text-xs font-bold text-primary-700">
+                      <span className="flex items-center gap-1 text-primary-600">
+                        <FiInfo size={13} /> بيانات الصنف:
+                      </span>
+                      <span>
+                        وحدة البيع:{" "}
+                        <span className="text-ink/70">{labelOf(ITEM_UNITS, selectedItem.unit)}</span>
+                      </span>
+                      <span>
+                        وحدة التخزين:{" "}
+                        <span className="text-ink/70">
+                          {labelOf(ITEM_UNITS, selectedItem.stock_unit)}
+                        </span>
+                      </span>
+                      <span>
+                        معامل التحويل: <span className="text-ink/70">{selectedItem.conversion_factor}</span>
+                      </span>
+                      <span className="text-ink/40">
+                        (كل {labelOf(ITEM_UNITS, selectedItem.unit)} واحد = {selectedItem.conversion_factor}{" "}
+                        {labelOf(ITEM_UNITS, selectedItem.stock_unit)})
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <div className="col-span-5 sm:col-span-3">
-                  <TextField
-                    label="الكمية"
-                    name={`qty_${idx}`}
-                    type="number"
-                    min={1}
-                    value={row.quantity}
-                    onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
-                  />
-                </div>
-                <div className="col-span-5 sm:col-span-3">
-                  <TextField
-                    label="سعر الشراء"
-                    name={`price_${idx}`}
-                    type="number"
-                    min={0}
-                    value={row.purchase_price}
-                    onChange={(e) => updateRow(idx, { purchase_price: Number(e.target.value) })}
-                  />
-                </div>
-                <div className="col-span-2 sm:col-span-1">
-                  <button
-                    type="button"
-                    onClick={() => removeRow(idx)}
-                    disabled={rows.length === 1}
-                    className="rounded-lg p-2.5 text-coral-500 hover:bg-coral-500/10 disabled:opacity-30"
-                    aria-label="حذف الصف"
-                  >
-                    <FiTrash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
