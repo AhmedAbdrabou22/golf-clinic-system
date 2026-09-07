@@ -2,8 +2,10 @@ import { Routes, Route } from "react-router-dom";
 import MainLayout from "@/layouts/MainLayout";
 import ProtectedRoute from "@/routes/ProtectedRoute";
 import GuestRoute from "@/routes/GuestRoute";
+import RequireOpenShift from "@/routes/RequireOpenShift";
 
 import LoginPage from "@/pages/LoginPage";
+import OpenShiftPage from "@/pages/OpenShiftPage";
 import DashboardPage from "@/pages/DashboardPage";
 import StaffPage from "@/pages/StaffPage";
 import RolesPage from "@/pages/RolesPage";
@@ -27,20 +29,24 @@ function App() {
       </Route>
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<MainLayout />}>
-          <Route path="/" element={<DashboardPage />} />
-          <Route path="/staff" element={<StaffPage />} />
-          <Route path="/roles" element={<RolesPage />} />
-          <Route path="/departments" element={<DepartmentsPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/suppliers" element={<SuppliersPage />} />
-          <Route path="/items" element={<ItemsPage />} />
-          <Route path="/purchase-invoices" element={<PurchaseInvoicesPage />} />
-          <Route path="/patients" element={<PatientsPage />} />
-          <Route path="/appointments" element={<AppointmentsPage />} />
-          <Route path="/shifts" element={<ShiftsPage />} />
-          <Route path="/invoices" element={<InvoicesPage />} />
+        <Route path="/open-shift" element={<OpenShiftPage />} />
+
+        <Route element={<RequireOpenShift />}>
+          <Route element={<MainLayout />}>
+            <Route path="/" element={<DashboardPage />} />
+            <Route path="/staff" element={<StaffPage />} />
+            <Route path="/roles" element={<RolesPage />} />
+            <Route path="/departments" element={<DepartmentsPage />} />
+            <Route path="/services" element={<ServicesPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/suppliers" element={<SuppliersPage />} />
+            <Route path="/items" element={<ItemsPage />} />
+            <Route path="/purchase-invoices" element={<PurchaseInvoicesPage />} />
+            <Route path="/patients" element={<PatientsPage />} />
+            <Route path="/appointments" element={<AppointmentsPage />} />
+            <Route path="/shifts" element={<ShiftsPage />} />
+            <Route path="/invoices" element={<InvoicesPage />} />
+          </Route>
         </Route>
       </Route>
 

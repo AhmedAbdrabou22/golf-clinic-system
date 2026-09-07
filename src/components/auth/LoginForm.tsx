@@ -28,8 +28,10 @@ const LoginForm = () => {
       const token = res.access_token;
       const user = res.user;
       if (user) login(user, token);
-      const redirectTo = (location.state as any)?.from?.pathname ?? "/";
-      navigate(redirectTo, { replace: true });
+      // const redirectTo = (location.state as any)?.from?.pathname ?? "/";
+      // navigate(redirectTo, { replace: true });
+        navigate("/open-shift", { replace: true });
+
     },
   });
 
