@@ -35,7 +35,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
         conversion_factor:
           item?.conversion_factor != null ? String(item.conversion_factor) : "1",
         type: item?.type ?? "retailable",
-        current_stock: item?.current_stock != null ? String(item.current_stock) : "",
+        current_stock: "0",
         selling_price: item?.selling_price != null ? String(item.selling_price) : "",
         is_active: item?.is_active ?? true,
       });
@@ -66,7 +66,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
       is_active: form.is_active,
     };
     if (!isEdit) {
-      payload.current_stock = Number(form.current_stock || 0);
+      payload.current_stock = Number(0);
     }
     mutate(payload);
   };
@@ -132,7 +132,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
           hint="كام وحدة تخزين تعادل وحدة البيع الواحدة؟ مثال: فايل واحد = 5 مللي → 5"
         />
 
-        {!isEdit && (
+        {/* {!isEdit && (
           <TextField
             label="الكمية الحالية بالمخزن"
             name="current_stock"
@@ -142,7 +142,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
             value={form.current_stock}
             onChange={(e) => setForm({ ...form, current_stock: e.target.value })}
           />
-        )}
+        )} */}
 
         {!isConsumable && (
           <TextField
