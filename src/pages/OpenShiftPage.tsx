@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import useMutate from "@/hooks/useMutate";
 import { useAuth } from "@/context/AuthContext";
+import { Shift } from "@/types";
 
 interface Coords {
   latitude: number;
@@ -13,7 +14,7 @@ interface Coords {
 
 const OpenShiftPage = () => {
   const navigate = useNavigate();
-  const { user, setShiftOpen } = useAuth();
+const { user, setActiveShift } = useAuth();
   const isReceptionist = user?.type === "receptionist";
   const [coords, setCoords] = useState<Coords | null>(null);
   const [locating, setLocating] = useState(true);
@@ -51,16 +52,17 @@ const OpenShiftPage = () => {
     requestLocation();
   }, []);
 
-  const { mutate, isLoading } = useMutate({
-    endpoint: "shifts/open",
-    method: "post",
-    mutationKey: ["shift-open"],
-    successMessage: "تم فتح الشفت بنجاح، بالتوفيق في يومك!",
-    onSuccess: () => {
-      setShiftOpen(true);
-      navigate("/", { replace: true });
-    },
-  });
+const { mutate, isLoading } = useMutate<{ data: Shift } | Shift>({
+  endpoint: "shifts/open",
+  method: "post",
+  mutationKey: ["shift-open"],
+  successMessage: "تم فتح الشفت بنجاح، بالتوفيق في يومك!",
+  onSuccess: (res: any) => {
+    const shift: Shift = res?.data ?? res;
+    setActiveShift(shift);
+    navigate("/", { replace: true });
+  },
+});
 
   const handleOpenShift = () => {
     if (!coords) {

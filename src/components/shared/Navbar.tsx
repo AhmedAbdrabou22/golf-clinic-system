@@ -158,21 +158,7 @@ const Navbar = () => {
         </nav>
       )}
 
-      {/* خط النبض - العنصر المميز للهوية البصرية */}
-      <svg
-        className="pulse-line"
-        viewBox="0 0 1200 34"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          d="M0 17 H430 L455 4 L478 30 L500 10 L520 17 H770 L795 4 L818 30 L840 10 L860 17 H1200"
-          fill="none"
-          stroke="#0F6E5F"
-          strokeOpacity="0.18"
-          strokeWidth="2"
-        />
-      </svg>
+     
     </header>
   );
 };

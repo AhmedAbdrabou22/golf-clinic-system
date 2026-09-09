@@ -6,7 +6,8 @@ import { useAuth } from "@/context/AuthContext";
 import type { AuthUser } from "@/types";
 
 interface LoginResponse {
-  data?: { access_token: string; user: AuthUser };
+  data?: { token: string; user: AuthUser };
+  token?: string;
   access_token?: string;
   user?: AuthUser;
 }
@@ -19,19 +20,16 @@ const LoginForm = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const { mutate, isLoading } = useMutate<LoginResponse>({
+ const { mutate, isLoading } = useMutate<LoginResponse>({
     endpoint: "auth/login",
     mutationKey: ["auth-login"],
     successMessage: "تم تسجيل الدخول بنجاح",
     onSuccess: (res) => {
-      console.log("res",res);
-      const token = res.access_token;
-      const user = res.user;
+      const token = res.access_token ?? res.token ?? res.data?.token ?? "";
+      const user = res.user ?? res.data?.user;
       if (user) login(user, token);
-      // const redirectTo = (location.state as any)?.from?.pathname ?? "/";
-      // navigate(redirectTo, { replace: true });
-        navigate("/open-shift", { replace: true });
-
+      const hasOpenShift = user?.shift?.status === "open";
+      navigate(hasOpenShift ? "/" : "/open-shift", { replace: true });
     },
   });
 

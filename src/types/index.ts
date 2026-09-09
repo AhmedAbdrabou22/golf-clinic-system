@@ -50,6 +50,8 @@ export interface Staff {
 
 export interface AuthUser extends Staff {
   permissions?: string[];
+    shift?: Shift | null;
+
 }
 
 // ==================== الإعدادات، الأقسام، الخدمات ====================
@@ -161,16 +163,21 @@ export interface Appointment {
 // ==================== الشفتات ====================
 export interface Shift {
   id: number;
-  initial_balance: number;
-  final_balance?: number;
-  latitude?: number;
-  longitude?: number;
+  user_id?: number;
   status?: "open" | "closed";
-  opened_at?: string;
-  closed_at?: string;
-  staff?: Staff;
+  initial_balance: number | string;
+  final_balance?: number | string | null;
+  start_time?: string;
+  end_time?: string | null;
+  opening_latitude?: number | string;
+  opening_longitude?: number | string;
+  is_late?: boolean;
+  late_minutes?: number;
+  overtime_minutes?: number;
+  overtime_approved?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
-
 // ==================== الفواتير ====================
 export type InvoiceType = "consultation" | "session" | "direct_sale";
 export type PaymentMethod = "cash" | "visa" | "wallet" | "insurance";
