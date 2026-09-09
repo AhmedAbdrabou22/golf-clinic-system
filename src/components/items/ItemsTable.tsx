@@ -9,11 +9,13 @@ interface Props {
   isLoading: boolean;
   onEdit: (i: Item) => void;
   onDelete: (i: Item) => void;
+    startIndex?: number;
+
 }
 
-const ItemsTable = ({ items, isLoading, onEdit, onDelete }: Props) => {
+const ItemsTable = ({ items, isLoading, onEdit, onDelete , startIndex = 1}: Props) => {
   const columns: Column<Item>[] = [
-    { header: "#", accessor: (r) => r.id },
+    { header: "#", accessor: (_r, index) => startIndex + index },
     { header: "اسم الصنف", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
     {
       header: "النوع",

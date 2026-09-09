@@ -3,11 +3,11 @@ import { useAuth } from "@/context/AuthContext";
 
 // يمنع الدخول لأي صفحة تانية في السيستم قبل ما المستخدم يفتح الشفت بتاعه
 const RequireOpenShift = () => {
-  const { hasOpenShift } = useAuth();
+  // const { hasOpenShift } = useAuth();
 
-  if (!hasOpenShift) {
-    return <Navigate to="/open-shift" replace />;
-  }
+  // if (!hasOpenShift) {
+  //   return <Navigate to="/open-shift" replace />;
+  // }
 
   return <Outlet />;
 };

@@ -14,10 +14,13 @@ interface Coords {
 const OpenShiftPage = () => {
   const navigate = useNavigate();
   const { user, setShiftOpen } = useAuth();
+  const isReceptionist = user?.type === "receptionist";
   const [coords, setCoords] = useState<Coords | null>(null);
   const [locating, setLocating] = useState(true);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [initialBalance, setInitialBalance] = useState("500");
+
+
 
   const requestLocation = () => {
     if (!navigator.geolocation) {
@@ -65,23 +68,23 @@ const OpenShiftPage = () => {
       requestLocation();
       return;
     }
-    if (!initialBalance || Number(initialBalance) < 0) {
-      toast.error("من فضلك أدخل الرصيد الافتتاحي");
-      return;
-    }
-    mutate({
-      initial_balance: Number(initialBalance),
-      latitude: coords.latitude,
-      longitude: coords.longitude,
-    });
+    
+  if (isReceptionist && (!initialBalance || Number(initialBalance) < 0)) {
+    toast.error("من فضلك أدخل الرصيد الافتتاحي");
+    return;
+  }
+  mutate({
+    initial_balance: isReceptionist ? Number(initialBalance || 0) : 0,
+    latitude: coords.latitude,
+    longitude: coords.longitude,
+  });
   };
 
+
   const mapSrc = coords
-    ? `https://www.openstreetmap.org/export/embed.html?bbox=${coords.longitude - 0.006}%2C${
-        coords.latitude - 0.006
-      }%2C${coords.longitude + 0.006}%2C${coords.latitude + 0.006}&layer=mapnik&marker=${
-        coords.latitude
-      }%2C${coords.longitude}`
+    ? `https://www.openstreetmap.org/export/embed.html?bbox=${coords.longitude - 0.006}%2C${coords.latitude - 0.006
+    }%2C${coords.longitude + 0.006}%2C${coords.latitude + 0.006}&layer=mapnik&marker=${coords.latitude
+    }%2C${coords.longitude}`
     : null;
 
   return (
@@ -144,20 +147,21 @@ const OpenShiftPage = () => {
                 {locationError} — إعادة المحاولة
               </button>
             )}
-
-            <div>
-              <label htmlFor="initial_balance" className="field-label text-center">
-                الرصيد الافتتاحي (ج.م)
-              </label>
-              <input
-                id="initial_balance"
-                type="number"
-                min={0}
-                value={initialBalance}
-                onChange={(e) => setInitialBalance(e.target.value)}
-                className="field-input text-center text-lg font-extrabold"
-              />
-            </div>
+            {isReceptionist && (
+              <div>
+                <label htmlFor="initial_balance" className="field-label text-center">
+                  الرصيد الافتتاحي (ج.م)
+                </label>
+                <input
+                  id="initial_balance"
+                  type="number"
+                  min={0}
+                  value={initialBalance}
+                  onChange={(e) => setInitialBalance(e.target.value)}
+                  className="field-input text-center text-lg font-extrabold"
+                />
+              </div>
+            )}
 
             <div className="mt-2 flex flex-col items-center gap-3">
               <button
@@ -178,8 +182,8 @@ const OpenShiftPage = () => {
                 {isLoading
                   ? "جاري فتح الشفت..."
                   : locating
-                  ? "بنحدد موقعك الحالي..."
-                  : "دوس على البصمة لفتح الشفت"}
+                    ? "بنحدد موقعك الحالي..."
+                    : "دوس على البصمة لفتح الشفت"}
               </p>
             </div>
           </div>

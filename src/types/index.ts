@@ -6,6 +6,7 @@ export interface PaginatedResponse<T> {
     last_page: number;
     total: number;
     per_page: number;
+    from?:any;
   };
   links?: Record<string, string | null>;
 }
@@ -210,16 +211,25 @@ export interface Invoice {
 
 
 
+// export interface PaginationMeta {
+//   current_page: number;
+//   last_page: number;
+//   total: number;
+//   per_page: number;
+//   from?: number | null;
+//   to?: number | null;
+//   path?: string;
+// }
+
 export interface PaginationMeta {
   current_page: number;
   last_page: number;
   total: number;
   per_page: number;
   from?: number | null;
-  to?: number | null;
+    to?: number | null;
   path?: string;
 }
-
 export interface PaginationLinks {
   first?: string | null;
   last?: string | null;

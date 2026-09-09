@@ -63,6 +63,8 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 import type { AuthUser } from "@/types";
 
+const TOKEN_TTL_MS = 12 * 60 * 60 * 1000;
+
 interface AuthContextValue {
   user: AuthUser | null;
   token: string | null;
@@ -91,7 +93,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const login = (userData: AuthUser, authToken: string) => {
-    Cookies.set("token", authToken, { expires: 7 });
+    Cookies.set("token", authToken, { expires: new Date(Date.now() + TOKEN_TTL_MS) });
     localStorage.setItem("user", JSON.stringify(userData));
     localStorage.removeItem("shift_open");
     setUserState(userData);

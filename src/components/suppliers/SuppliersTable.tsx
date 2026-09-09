@@ -7,14 +7,15 @@ interface Props {
   isLoading: boolean;
   onEdit: (s: Supplier) => void;
   onDelete: (s: Supplier) => void;
+  startIndex?: number;
 }
 
-const SuppliersTable = ({ suppliers, isLoading, onEdit, onDelete }: Props) => {
+const SuppliersTable = ({ suppliers, isLoading, onEdit, onDelete, startIndex = 1 }: Props) => {
   const columns: Column<Supplier>[] = [
-    { header: "#", accessor: (r) => r.id },
+    { header: "#", accessor: (_r, index) => startIndex + index },
     { header: "اسم المورد", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
     { header: "الهاتف", accessor: (r) => <span dir="ltr">{r.phone ?? "—"}</span> },
-    // { header: "العنوان", accessor: (r) => r.address ?? "—" },
+    { header: "العنوان", accessor: (r) => r.address ?? "—" },
     {
       header: "إجراءات",
       accessor: (r) => (
