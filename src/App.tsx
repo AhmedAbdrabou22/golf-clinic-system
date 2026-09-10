@@ -20,6 +20,8 @@ import AppointmentsPage from "@/pages/AppointmentsPage";
 import ShiftsPage from "@/pages/ShiftsPage";
 import InvoicesPage from "@/pages/InvoicesPage";
 import NotFoundPage from "@/pages/NotFoundPage";
+import ReceptionPage from "./pages/ReceptionPage";
+import InvoiceCreatePage from "./pages/InvoiceCreatePage";
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
             <Route path="/" element={<DashboardPage />} />
             <Route path="/staff" element={<StaffPage />} />
             <Route path="/roles" element={<RolesPage />} />
+            <Route path="/reception" element={<ReceptionPage />} />
+            <Route path="/invoices/new" element={<InvoiceCreatePage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/settings" element={<SettingsPage />} />

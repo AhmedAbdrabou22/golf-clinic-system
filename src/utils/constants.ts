@@ -13,6 +13,7 @@ import {
   FiCalendar,
   FiClock,
   FiFileText,
+  FiClipboard,
 } from "react-icons/fi";
 
 export interface NavLink {
@@ -25,6 +26,7 @@ export interface NavLink {
 export const NAV_LINKS: NavLink[] = [
   { to: "/", label: "الرئيسية", icon: FiGrid, group: "clinic" },
   { to: "/patients", label: "المرضى", icon: FiUsers, group: "clinic" },
+  { to: "/reception", label: "الريسبشن", icon: FiClipboard, group: "clinic" },
   { to: "/appointments", label: "الحجوزات", icon: FiCalendar, group: "clinic" },
   { to: "/invoices", label: "الفواتير", icon: FiFileText, group: "clinic" },
   { to: "/shifts", label: "الشفتات", icon: FiClock, group: "clinic" },

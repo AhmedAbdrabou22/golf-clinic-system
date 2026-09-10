@@ -13,21 +13,21 @@ const RolesTable = ({ roles, isLoading, onEdit, onDelete }: Props) => {
   const columns: Column<Role>[] = [
     { header: "#", accessor: (r) => r.id },
     { header: "اسم الدور", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
-    {
-      header: "الصلاحيات",
-      accessor: (r) => (
-        <div className="flex flex-wrap gap-1.5">
-          {(r.permissions ?? []).slice(0, 4).map((p) => (
-            <span key={p} className="badge bg-primary-50 text-primary-600">
-              {p}
-            </span>
-          ))}
-          {(r.permissions?.length ?? 0) > 4 && (
-            <span className="badge bg-ink/5 text-ink/50">+{(r.permissions?.length ?? 0) - 4}</span>
-          )}
-        </div>
-      ),
-    },
+    // {
+    //   header: "الصلاحيات",
+    //   accessor: (r) => (
+    //     <div className="flex flex-wrap gap-1.5">
+    //       {(r.permissions ?? []).slice(0, 4).map((p) => (
+    //         <span key={p} className="badge bg-primary-50 text-primary-600">
+    //           {p}
+    //         </span>
+    //       ))}
+    //       {(r.permissions?.length ?? 0) > 4 && (
+    //         <span className="badge bg-ink/5 text-ink/50">+{(r.permissions?.length ?? 0) - 4}</span>
+    //       )}
+    //     </div>
+    //   ),
+    // },
     {
       header: "إجراءات",
       accessor: (r) => (

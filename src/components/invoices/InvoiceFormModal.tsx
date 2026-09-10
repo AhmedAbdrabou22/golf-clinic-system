@@ -286,7 +286,7 @@ const emptyRow: InvoiceItemInput = {
   item_type: "service",
   service_id: null,
   product_id: null,
-  quantity: 0,
+  quantity: 1,
 };
 
 const initialForm = {
@@ -443,7 +443,7 @@ const InvoiceFormModal = ({ open, onClose }: Props) => {
         // Product = selected quantity
         quantity:
           row.item_type === "service"
-            ? 0
+            ? 1
             : Number(row.quantity) || 1,
       })),
     });
@@ -610,7 +610,7 @@ const InvoiceFormModal = ({ open, onClose }: Props) => {
                         // Product = 1
                         quantity:
                           itemType === "service"
-                            ? 0
+                            ? 1
                             : 1,
                       });
                     }}
@@ -671,7 +671,7 @@ const InvoiceFormModal = ({ open, onClose }: Props) => {
                 </div>
 
                 {/* Quantity - Product Only */}
-                {row.item_type === "product" && (
+                {row.item_type === "service" && (
                   <div className="col-span-4 sm:col-span-3">
                     <TextField
                       label="الكمية"
