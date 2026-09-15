@@ -118,7 +118,7 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
 
   return (
     <>
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 xl:grid-cols-3">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 xl:grid-cols-2">
         {/* ===== العمود الرئيسي: بيانات الفاتورة + الأصناف ===== */}
         <div className="flex flex-col gap-5 xl:col-span-2">
           {/* بيانات أساسية */}
@@ -372,46 +372,48 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
           </div>
         </div>
 
-        {/* ===== العمود الجانبي: ملخص الفاتورة ===== */}
-        <div className="xl:col-span-1">
-          <div className="card sticky top-24 flex flex-col gap-4 p-5">
-            <h2 className="flex items-center gap-2 font-display text-base font-extrabold text-ink">
-              <FiPackage className="text-primary-500" size={18} />
-              ملخص الفاتورة
-            </h2>
 
-            <div className="flex flex-col gap-2 rounded-xl bg-mint-100/70 p-4 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-ink/55">عدد الأصناف</span>
-                <span className="font-bold text-ink">{rows.length}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-ink/55">إجمالي الأصناف</span>
-                <span className="font-bold text-ink">{itemsTotal.toFixed(2)} ج.م</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-ink/55">الخصم</span>
-                <span className="font-bold text-coral-600">- {discountValue.toFixed(2)} ج.م</span>
-              </div>
-              <div className="flex items-center justify-between border-t border-ink/10 pt-2">
-                <span className="font-bold text-ink/70">الإجمالي المطلوب</span>
-                <span className="font-display text-xl font-extrabold text-primary-600">
-                  {grandTotal.toFixed(2)} ج.م
-                </span>
-              </div>
-            </div>
-
-            <button type="submit" disabled={isLoading} className="btn-primary w-full py-3">
-              {isLoading ? "جاري الحفظ..." : "حفظ الفاتورة"}
-            </button>
-            {onCancel && (
-              <button type="button" onClick={onCancel} className="btn-secondary w-full py-3">
-                إلغاء
-              </button>
-            )}
-          </div>
-        </div>
       </form>
+
+      {/* ===== العمود الجانبي: ملخص الفاتورة ===== */}
+      <div className="xl:col-span-1">
+        <div className="card sticky top-24 flex flex-col gap-4 p-5">
+          <h2 className="flex items-center gap-2 font-display text-base font-extrabold text-ink">
+            <FiPackage className="text-primary-500" size={18} />
+            ملخص الفاتورة
+          </h2>
+
+          <div className="flex flex-col gap-2 rounded-xl bg-mint-100/70 p-4 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-ink/55">عدد الأصناف</span>
+              <span className="font-bold text-ink">{rows.length}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-ink/55">إجمالي الأصناف</span>
+              <span className="font-bold text-ink">{itemsTotal.toFixed(2)} ج.م</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="font-bold text-ink/55">الخصم</span>
+              <span className="font-bold text-coral-600">- {discountValue.toFixed(2)} ج.م</span>
+            </div>
+            <div className="flex items-center justify-between border-t border-ink/10 pt-2">
+              <span className="font-bold text-ink/70">الإجمالي المطلوب</span>
+              <span className="font-display text-xl font-extrabold text-primary-600">
+                {grandTotal.toFixed(2)} ج.م
+              </span>
+            </div>
+          </div>
+
+          <button type="submit" disabled={isLoading} className="btn-primary w-full py-3">
+            {isLoading ? "جاري الحفظ..." : "حفظ الفاتورة"}
+          </button>
+          {onCancel && (
+            <button type="button" onClick={onCancel} className="btn-secondary w-full py-3">
+              إلغاء
+            </button>
+          )}
+        </div>
+      </div>
 
       <PatientFormModal
         open={patientModalOpen}
