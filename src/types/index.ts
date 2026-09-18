@@ -67,6 +67,19 @@ export interface Service {
   department_id: number;
   department?: Department;
 }
+export interface ServiceItemInput {
+  item_id: number;
+  quantity: number;
+  price: number;
+}
+
+export interface InvoiceItemInput {
+  item_type: "service" | "product";
+  service_id?: number | null;
+  product_id?: number | null;
+  quantity: number;
+  service_items_ids?: ServiceItemInput[]; // ← بدل number[]
+}
 
 export interface Setting {
   id: number;
@@ -271,4 +284,42 @@ export interface Service {
   type: ServiceType;
   // مطلوبة فقط لو النوع "session" — الأصناف المستهلكة داخل الجلسة
   items?: ServiceItem[];
+}
+
+
+
+
+// مصروفات 
+// types.ts — إضافات
+
+export type ExpenseCategory = "utility" | "buffet" | "maintenance" | "rent" | "salaries" | "other";
+
+export interface Expense {
+  id: number;
+  title: string;
+  category: ExpenseCategory;
+  amount: string | number;
+  payment_method: Invoice["payment_method"];
+  expense_date: string;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ExpenseInput {
+  title: string;
+  category: ExpenseCategory;
+  amount: number;
+  payment_method: Invoice["payment_method"];
+  expense_date: string;
+  notes?: string | null;
+}
+
+export interface ExpenseSummary {
+  date_from: string;
+  date_to: string;
+  total_revenue: number;
+  total_expenses: number;
+  net_profit: number;
+  expenses_by_category: Record<ExpenseCategory, number>;
 }

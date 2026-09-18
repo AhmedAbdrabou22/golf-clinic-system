@@ -103,7 +103,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
 
         <div className="grid grid-cols-2 gap-3">
           <SelectField
-            label="وحدة البيع/العرض"
+            label="وحدة الشراء (العبوه)"
             name="unit"
             required
             value={form.unit}
@@ -111,7 +111,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
             options={ITEM_UNITS}
           />
           <SelectField
-            label="وحدة التخزين بالمخزن"
+            label="وحدة الاستهلاك (مللي/قرص)"
             name="stock_unit"
             required
             value={form.stock_unit}
@@ -121,7 +121,7 @@ const ItemFormModal = ({ open, onClose, item }: Props) => {
         </div>
 
         <TextField
-          label="معامل التحويل"
+          label="ما تحتويه العبوه الواحده (كم مللي يوجد بالفايل الواحد)"
           name="conversion_factor"
           type="number"
           min={0}

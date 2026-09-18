@@ -16,10 +16,10 @@ interface Props {
 interface ItemRow {
   item_id: string;
   quantity: string;
+  price: string;
 }
 
-const emptyRow = (): ItemRow => ({ item_id: "", quantity: "1" });
-
+const emptyRow = (): ItemRow => ({ item_id: "", quantity: "1", price: "" });
 const ServiceFormModal = ({ open, onClose, service }: Props) => {
   const isEdit = !!service;
   const [form, setForm] = useState({
@@ -40,7 +40,11 @@ const ServiceFormModal = ({ open, onClose, service }: Props) => {
       });
       setItemRows(
         service?.items && service.items.length > 0
-          ? service.items.map((i) => ({ item_id: String(i.item_id), quantity: String(i.quantity) }))
+          ? service.items.map((i:any) => ({
+            item_id: String(i.item_id),
+            quantity: String(i.quantity),
+            price: i.price != null ? String(i.price) : "",
+          }))
           : [emptyRow()]
       );
     }
@@ -53,7 +57,7 @@ const ServiceFormModal = ({ open, onClose, service }: Props) => {
   });
   const departments = deptData?.data ?? (Array.isArray(deptData) ? (deptData as any) : []);
 
-  const isSession = form.type === "session";
+  const isSession = form.type === "device";
 
   const { data: itemsData } = useFetch<{ data: Item[] }>({
     queryKey: ["items"],
@@ -93,9 +97,15 @@ const ServiceFormModal = ({ open, onClose, service }: Props) => {
     if (isSession) {
       payload.items = itemRows
         .filter((r) => r.item_id)
-        .map((r) => ({ item_id: Number(r.item_id), quantity: Number(r.quantity || 0) }));
+        .map((r) => ({
+          item_id: Number(r.item_id),
+          quantity: Number(r.quantity || 0),
+          price: Number(r.price || 0),
+        }));
     }
-
+  console.log("📤 items count:", payload.items?.length);
+  console.log("📤 items:", payload.items);
+  console.log("📤 full payload:", JSON.stringify(payload, null, 2));
     mutate(payload);
   };
 
@@ -155,40 +165,51 @@ const ServiceFormModal = ({ open, onClose, service }: Props) => {
             <div className="flex flex-col gap-2">
               {itemRows.map((row, idx) => (
                 <div key={idx} className="flex items-end gap-2">
-                  <div className="flex-1">
-                    <select
-                      className="field-input"
-                      value={row.item_id}
-                      required
-                      onChange={(e) => updateRow(idx, { item_id: e.target.value })}
-                    >
-                      <option value="">اختر الصنف...</option>
-                      {items.map((it: Item) => (
-                        <option key={it.id} value={it.id}>
-                          {it.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <input
-                    type="number"
-                    min={0}
-                    step="0.1"
-                    required
-                    placeholder="الكمية"
-                    className="field-input w-24"
-                    value={row.quantity}
-                    onChange={(e) => updateRow(idx, { quantity: e.target.value })}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeRow(idx)}
-                    className="mb-0.5 rounded-lg p-2.5 text-coral-500 hover:bg-coral-500/10"
-                    aria-label="حذف الصنف"
-                  >
-                    <FiTrash2 size={16} />
-                  </button>
-                </div>
+  <div className="flex-1">
+    <select
+      className="field-input"
+      value={row.item_id}
+      required
+      onChange={(e) => updateRow(idx, { item_id: e.target.value })}
+    >
+      <option value="">اختر الصنف...</option>
+      {items.map((it: Item) => (
+        <option key={it.id} value={it.id}>
+          {it.name}
+        </option>
+      ))}
+    </select>
+  </div>
+  <input
+    type="number"
+    min={0}
+    step="0.1"
+    required
+    placeholder="الكمية"
+    className="field-input w-24"
+    value={row.quantity}
+    onChange={(e) => updateRow(idx, { quantity: e.target.value })}
+  />
+  <input
+    type="number"
+    min={0}
+    step="0.1"
+    required
+    placeholder="السعر"
+    className="field-input w-24"
+    value={row.price}
+    onChange={(e) => updateRow(idx, { price: e.target.value })}
+  />
+
+  <button
+    type="button"
+    onClick={() => removeRow(idx)}
+    className="mb-0.5 rounded-lg p-2.5 text-coral-500 hover:bg-coral-500/10"
+    aria-label="حذف الصنف"
+  >
+    <FiTrash2 size={16} />
+  </button>
+</div>
               ))}
             </div>
           </div>
