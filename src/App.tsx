@@ -86,6 +86,7 @@ import ExpensesPage from "@/pages/ExpensesPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import ReceptionPage from "./pages/ReceptionPage";
 import InvoiceCreatePage from "./pages/InvoiceCreatePage";
+import FollowPage from "./pages/FollowUpsPage";
 
 function App() {
   return (
@@ -113,6 +114,7 @@ function App() {
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/shifts" element={<ShiftsPage />} />
+             <Route path="/follow-ups" element={<FollowPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />
             <Route path="/expenses" element={<ExpensesPage />} />
           </Route>

@@ -40,9 +40,6 @@ const Navbar = () => {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         {/* الشعار */}
         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary-500 font-display text-lg font-extrabold text-white">
-            س
-          </span>
           <span className="hidden font-display text-lg font-extrabold text-ink sm:block">
             الجولف كلينك
           </span>

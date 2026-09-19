@@ -161,6 +161,7 @@ export const NAV_LINKS: NavLink[] = [
   { to: "/appointments", label: "الحجوزات", icon: FiCalendar, group: "clinic" },
   { to: "/invoices", label: "الفواتير", icon: FiFileText, group: "clinic" },
   { to: "/shifts", label: "الشفتات", icon: FiClock, group: "clinic" },
+    { to: "/follow-ups", label: "المتابعات", icon: FiClock, group: "clinic" },
   { to: "/departments", label: "الأقسام", icon: FiLayers, group: "admin" },
   { to: "/services", label: "الخدمات", icon: FiTag, group: "admin" },
   { to: "/suppliers", label: "الموردين", icon: FiTruck, group: "inventory" },
@@ -263,3 +264,13 @@ export const toneOf = (
   list: { value: string; tone: string }[],
   value?: string | null
 ) => list.find((i) => i.value === value)?.tone ?? "gray";
+
+
+
+
+export const FOLLOW_UP_STATUSES = [
+  { value: "pending",   label: "قيد الانتظار", tone: "warning" },
+  { value: "completed", label: "مكتملة",       tone: "success" },
+  { value: "cancelled", label: "ملغية",        tone: "danger"  },
+  { value: "missed",    label: "لم يحضر",      tone: "danger"  },
+];

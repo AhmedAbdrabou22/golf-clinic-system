@@ -323,3 +323,38 @@ export interface ExpenseSummary {
   net_profit: number;
   expenses_by_category: Record<ExpenseCategory, number>;
 }
+
+
+
+//follow ups 
+export interface FollowUp {
+  id: number;
+  patient_id: number;
+  doctor_id: number;
+  appointment_id: number;
+  follow_up_date: string; // "YYYY-MM-DD HH:mm:ss"
+  status: "pending" | "done" | "cancelled";
+  notes: string;
+  patient?: {
+    id: number;
+    name: string;
+  };
+  doctor?: {
+    id: number;
+    name: string;
+  };
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface FollowUpFormValues {
+  patient_id: number | "";
+  doctor_id: number | "";
+  appointment_id: number | "";
+  follow_up_date: string;
+  status: FollowUp["status"];
+  notes: string;
+}
+
+
+
