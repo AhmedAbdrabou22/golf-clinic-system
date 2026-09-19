@@ -1,4 +1,4 @@
-import { FiEye, FiRotateCcw, FiTrash2 } from "react-icons/fi";
+import { FiCreditCard, FiEye, FiRotateCcw, FiTrash2 } from "react-icons/fi";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { INVOICE_TYPES, PAYMENT_METHODS, labelOf } from "@/utils/constants";
@@ -8,11 +8,12 @@ interface Props {
   invoices: Invoice[];
   isLoading: boolean;
   onView: (inv: Invoice) => void;
+    onPay: (inv: Invoice) => void;
   onRefund: (inv: Invoice) => void;
   onDelete: (inv: Invoice) => void;
 }
 
-const InvoicesTable = ({ invoices, isLoading, onView, onRefund, onDelete }: Props) => {
+const InvoicesTable = ({ invoices, isLoading, onView, onPay,onRefund, onDelete }: Props) => {
   const columns: Column<Invoice>[] = [
     { header: "#", accessor: (r) => r.id },
     { header: "المريض", accessor: (r) => <span className="font-bold text-ink">{r.patient?.name ?? `#${r.patient_id}`}</span> },
@@ -44,6 +45,17 @@ const InvoicesTable = ({ invoices, isLoading, onView, onRefund, onDelete }: Prop
           <button onClick={() => onDelete(r)} className="rounded-lg p-2 text-coral-500 hover:bg-coral-500/10" aria-label="حذف">
             <FiTrash2 size={16} />
           </button>
+          
+              <button
+                onClick={() => onPay(r)}
+                className="rounded-lg p-2 text-emerald-600 hover:bg-emerald-50"
+                aria-label="دفع"
+                title="تسجيل دفعة"
+              >
+                <FiCreditCard size={16} />
+              </button>
+            
+
         </div>
       ),
     },

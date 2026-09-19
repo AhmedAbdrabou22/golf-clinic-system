@@ -227,6 +227,7 @@ export interface Invoice {
   status?: "paid" | "refunded" | "partial_refund";
   items: InvoiceItem[];
   created_at?: string;
+  remaining_amount:any;
 }
 
 
