@@ -19,12 +19,12 @@ const money = (n?: number | null) => `${Number(n ?? 0).toFixed(2)} ج.م`;
 const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
   const [form, setForm] = useState({ other_allowances: "", deductions: "", notes: "" });
 
-  const { data, isLoading } = useFetch<ApiEnvelope<Payroll> | Payroll>({
+  const { data, isLoading } = useFetch<ApiEnvelope<any> | any>({
     queryKey: ["payroll-details", payrollId],
     endpoint: `payrolls/${payrollId}`,
     enabled: open && !!payrollId,
   });
-  const payroll = (data as ApiEnvelope<Payroll>)?.data ?? (data as Payroll);
+  const payroll = (data as ApiEnvelope<any>)?.data ?? (data as Payroll);
 
   useEffect(() => {
     if (open && payroll) {
@@ -55,12 +55,21 @@ const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
 
   const isDraft = payroll?.status === "draft";
 
+  // حساب الإجماليات من items لو موجودة
+  const additions = payroll?.items
+    ?.filter((i) => i.is_addition)
+    .reduce((sum, i) => sum + Number(i.amount ?? 0), 0) ?? 0;
+  const deductionsTotal = payroll?.items
+    ?.filter((i) => !i.is_addition)
+    .reduce((sum, i) => sum + Number(i.amount ?? 0), 0) ?? 0;
+
   return (
     <Modal open={open} onClose={onClose} title="تفاصيل مسير الراتب" width="md">
       {isLoading || !payroll ? (
         <div className="h-40 animate-pulse rounded-xl bg-paper" />
       ) : (
         <div className="flex flex-col gap-5">
+          {/* رأس المودال */}
           <div className="flex items-center justify-between">
             <div>
               <p className="font-bold text-ink">{payroll.user?.name ?? `موظف #${payroll.user_id}`}</p>
@@ -69,35 +78,78 @@ const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
             <StatusBadge label={labelOf(PAYROLL_STATUSES, payroll.status)} tone={toneOf(PAYROLL_STATUSES, payroll.status)} />
           </div>
 
-          {/* تفنيد البنود — لو الـ API رجّع items نعرضها، وإلا نعرض الحقول المجمّعة المعروفة */}
+          {/* بيانات الموظف */}
+          {payroll.user && (
+            <div className="card grid grid-cols-2 gap-3 p-4 text-sm">
+              <Info label="النوع" value={payroll.user.type} />
+              <Info label="البريد" value={payroll.user.email} />
+              <Info label="الهاتف" value={payroll.user.phone} />
+              <Info label="الراتب الأساسي (العقد)" value={money(payroll.user.basic_salary)} />
+            </div>
+          )}
+
+          {/* تفنيد البنود */}
           <div className="card divide-y divide-ink/5 p-0">
             {payroll.items && payroll.items.length > 0 ? (
-              payroll.items.map((item, i) => (
-                <div key={i} className="flex items-center justify-between px-4 py-2.5 text-sm">
-                  <span className="text-ink/70">{item.label}</span>
-                  <span className={`font-bold ${item.type === "deduction" ? "text-coral-600" : "text-ink"}`}>
-                    {item.type === "deduction" ? "− " : ""}
+              payroll.items.map((item) => (
+                <div key={item.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                  <div className="flex flex-col">
+                    <span className="text-ink/70">{item.description}</span>
+                    {item.metadata?.invoice_number && (
+                      <span className="text-[10px] text-ink/40">
+                        فاتورة: {item.metadata.invoice_number}
+                        {item.metadata.service_name ? ` — ${item.metadata.service_name}` : ""}
+                      </span>
+                    )}
+                  </div>
+                  <span className={`font-bold ${!item.is_addition ? "text-coral-600" : "text-ink"}`}>
+                    {!item.is_addition ? "− " : ""}
                     {money(item.amount)}
                   </span>
                 </div>
               ))
             ) : (
               <>
-                <Row label="الراتب الأساسي" value={payroll.base_salary} />
-                <Row label="إجمالي العمولات" value={payroll.commissions_total} />
-                <Row label="الوقت الإضافي" value={payroll.overtime_total} />
-                <Row label="بدل الإجازات" value={payroll.holiday_allowance} />
+                <Row label="الراتب الأساسي" value={payroll.basic_salary} />
+                <Row label="إجمالي العمولات" value={payroll.service_commissions_amount} />
+                <Row label="الوقت الإضافي" value={payroll.overtime_amount} />
+                <Row label="بدل الإجازات" value={payroll.holiday_allowance_amount} />
                 <Row label="بدلات أخرى" value={payroll.other_allowances} />
-                <Row label="خصم التأخير" value={payroll.late_deduction_total} negative />
+                <Row label="خصم التأخير" value={payroll.late_deduction_amount} negative />
                 <Row label="خصومات يدوية" value={payroll.deductions} negative />
               </>
             )}
+
+            {/* ملخص الإجماليات */}
+            <div className="flex items-center justify-between px-4 py-2 text-xs text-ink/50">
+              <span>إجمالي الإضافات</span>
+              <span className="font-bold text-emerald-600">{money(additions)}</span>
+            </div>
+            <div className="flex items-center justify-between px-4 py-2 text-xs text-ink/50">
+              <span>إجمالي الخصومات</span>
+              <span className="font-bold text-coral-600">{money(deductionsTotal)}</span>
+            </div>
             <div className="flex items-center justify-between bg-paper px-4 py-3">
               <span className="font-bold text-ink">صافي الراتب</span>
               <span className="font-display text-lg font-extrabold text-primary-600">{money(payroll.net_salary)}</span>
             </div>
           </div>
 
+          {/* تفاصيل إضافية (اختياري) */}
+          <div className="card grid grid-cols-2 gap-3 p-4 text-xs text-ink/60">
+            <Info label="عدد الورديات" value={String(payroll.shifts_count ?? 0)} />
+            <Info label="ساعات العمل" value={String(payroll.total_working_hours ?? 0)} />
+            <Info label="ساعات إضافية" value={String(payroll.overtime_hours ?? 0)} />
+            <Info label="دقائق التأخير" value={String(payroll.late_minutes ?? 0)} />
+            <Info label="أيام الإجازات" value={String(payroll.holiday_days ?? 0)} />
+            <Info label="عدد الخدمات" value={String(payroll.services_count ?? 0)} />
+            <Info label="عمولات الأجهزة" value={money(payroll.device_commissions_amount)} />
+            <Info label="عمولات المنتجات" value={money(payroll.product_commissions_amount)} />
+            <Info label="عمولات القسم" value={money(payroll.department_commissions_amount)} />
+            <Info label="الإجمالي قبل الخصم" value={money(payroll.gross_salary)} />
+          </div>
+
+          {/* نموذج التعديل */}
           {isDraft && (
             <form onSubmit={handleSave} className="flex flex-col gap-4 rounded-xl border border-ink/10 p-4">
               <p className="text-xs font-bold text-ink/50">تعديل البدلات أو الخصومات اليدوية</p>
@@ -152,5 +204,12 @@ const Row = ({ label, value, negative }: { label: string; value?: number | null;
     </div>
   );
 };
+
+const Info = ({ label, value }: { label: string; value?: string | null }) => (
+  <div className="flex flex-col gap-0.5">
+    <span className="text-ink/40">{label}</span>
+    <span className="font-medium text-ink">{value ?? "—"}</span>
+  </div>
+);
 
 export default PayrollDetailsModal;
