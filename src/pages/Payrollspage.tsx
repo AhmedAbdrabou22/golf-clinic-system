@@ -113,12 +113,16 @@ const PayrollsPage = () => {
       <PayPayrollModal open={!!toPay} onClose={() => setToPay(null)} payroll={toPay} />
 
       <ConfirmDialog
-        open={!!toApprove}
-        onClose={() => setToApprove(null)}
-        onConfirm={() => toApprove && approvePayroll(toApprove)}
-        loading={approving}
-        message={`هل تريد اعتماد راتب "${toApprove?.user?.name ?? `موظف #${toApprove?.user_id}`}" عن شهر ${toApprove?.month}؟`}
-      />
+  open={!!toApprove}
+  onClose={() => setToApprove(null)}
+  onConfirm={() => toApprove && approvePayroll(toApprove)}
+  loading={approving}
+  tone="primary"
+  title="تأكيد اعتماد الراتب"
+  confirmLabel="اعتماد"
+  loadingLabel="جاري الاعتماد..."
+  message={`هل تريد اعتماد راتب "${toApprove?.user?.name ?? `موظف #${toApprove?.user_id}`}" عن شهر ${toApprove?.month}؟`}
+/>
 
       <ConfirmDialog
         open={!!toDelete}
