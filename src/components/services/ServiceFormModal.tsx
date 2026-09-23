@@ -31,24 +31,24 @@ const ServiceFormModal = ({ open, onClose, service }: Props) => {
   const [itemRows, setItemRows] = useState<ItemRow[]>([emptyRow()]);
 
   useEffect(() => {
-    if (open) {
-      setForm({
-        name: service?.name ?? "",
-        price: service?.price != null ? String(service.price) : "",
-        department_id: service?.department_id != null ? String(service.department_id) : "",
-        type: service?.type ?? "consultation",
-      });
-      setItemRows(
-        service?.items && service.items.length > 0
-          ? service.items.map((i:any) => ({
-            item_id: String(i.item_id),
-            quantity: String(i.quantity),
+  if (open) {
+    setForm({
+      name: service?.name ?? "",
+      price: service?.price != null ? String(service.price) : "",
+      department_id: service?.department_id != null ? String(service.department_id) : "",
+      type: service?.type ?? "consultation",
+    });
+    setItemRows(
+      service?.items && service.items.length > 0
+        ? service.items.map((i: any) => ({
+            item_id: String(i.item_id ?? i.item?.id ?? i.id ?? ""),
+            quantity: i.quantity != null ? String(i.quantity) : "1",
             price: i.price != null ? String(i.price) : "",
           }))
-          : [emptyRow()]
-      );
-    }
-  }, [open, service]);
+        : [emptyRow()]
+    );
+  }
+}, [open, service]);
 
   const { data: deptData } = useFetch<{ data: Department[] }>({
     queryKey: ["departments"],
@@ -103,9 +103,6 @@ const ServiceFormModal = ({ open, onClose, service }: Props) => {
           price: Number(r.price || 0),
         }));
     }
-  console.log("📤 items count:", payload.items?.length);
-  console.log("📤 items:", payload.items);
-  console.log("📤 full payload:", JSON.stringify(payload, null, 2));
     mutate(payload);
   };
 

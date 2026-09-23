@@ -4,7 +4,7 @@ import StatusBadge from "@/components/shared/StatusBadge";
 import { STAFF_TYPES, labelOf } from "@/utils/constants";
 import type { Staff } from "@/types";
 
-interface Props {
+interface Props { 
   staff: Staff[];
   isLoading: boolean;
   onEdit: (s: Staff) => void;

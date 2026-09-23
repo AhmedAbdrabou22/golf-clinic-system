@@ -216,18 +216,18 @@ const AppointmentFormModal = ({ open, onClose, appointment }: Props) => {
       setForm(
         appointment
           ? {
-              patient_id: String(appointment.patient_id),
-              department_id: String(appointment.service?.department_id ?? ""),
-              doctor_id: String(appointment.doctor_id),
-              service_id: String(appointment.service_id),
-              service_items_ids:
-                (appointment as any).service_items_ids ??
-                (appointment as any).service_items?.map((si: any) => si.id) ??
-                [],
-              appointment_date: appointment.appointment_date?.slice(0, 10) ?? "",
-              visit_type: appointment.visit_type,
-              notes: appointment.notes ?? "",
-            }
+            patient_id: String(appointment.patient_id),
+            department_id: String(appointment.service?.department_id ?? ""),
+            doctor_id: String(appointment.doctor_id),
+            service_id: String(appointment.service_id),
+            service_items_ids:
+              (appointment as any).service_items_ids ??
+              (appointment as any).service_items?.map((si: any) => si.id) ??
+              [],
+            appointment_date: appointment.appointment_date?.slice(0, 10) ?? "",
+            visit_type: appointment.visit_type,
+            notes: appointment.notes ?? "",
+          }
           : initialForm
       );
     }
@@ -395,94 +395,62 @@ const AppointmentFormModal = ({ open, onClose, appointment }: Props) => {
 
         {/* ==== الأصناف المستهلكة في الخدمة المختارة ==== */}
         {/* ==== الأصناف المستهلكة في الخدمة المختارة ==== */}
-{selectedService && selectedService.items && selectedService.items.length > 0 && (
-  <div className="rounded-xl bg-mint-100/70 px-4 py-3">
-    <p className="mb-3 flex items-center gap-1 text-xs font-bold text-primary-600">
-      الأصناف المستهلكة في هذه الخدمة (اختر ما سيتم استخدامه):
-    </p>
-    <div className="flex flex-col gap-2">
-      {selectedService.items.map((si: any) => {
-        const checked = (form.service_items_ids ?? []).includes(si.id);
-        return (
-          <label
-            key={si.id}
-            className={`flex cursor-pointer flex-col gap-2 rounded-lg border px-3 py-2.5 transition ${
-              checked
-                ? "border-primary-500 bg-white"
-                : "border-transparent bg-white/60 hover:bg-white"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="accent-primary-600"
-                checked={checked}
-                onChange={() => toggleServiceItem(si.id)}
-              />
-              <span className="text-sm font-bold text-ink">{si.name}</span>
-            </div>
+        {selectedService && selectedService.items && selectedService.items.length > 0 && (
+          <div className="rounded-xl bg-mint-100/70 px-4 py-3">
+            <p className="mb-3 flex items-center gap-1 text-xs font-bold text-primary-600">
+              الأصناف المستهلكة في هذه الخدمة (اختر ما سيتم استخدامه):
+            </p>
+            <div className="flex flex-col gap-2">
+              {selectedService.items
+  .filter((si: any) => Number(si.current_stock) > 0)
+  .map((si: any) => {
+    const checked = (form.service_items_ids ?? []).includes(si.id);
+    return (
+      <label
+        key={si.id}
+        className={`flex cursor-pointer flex-col gap-2 rounded-lg border px-3 py-2.5 transition ${checked
+            ? "border-primary-500 bg-white"
+            : "border-transparent bg-white/60 hover:bg-white"
+          }`}
+      >
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            className="accent-primary-600"
+            checked={checked}
+            onChange={() => toggleServiceItem(si.id)}
+          />
+          <span className="text-sm font-bold text-ink">{si.name}</span>
+        </div>
 
-            {/* بيانات الـ item كاملة - للعرض فقط */}
-            <div className="ms-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-bold text-ink/60">
-              <span>
-                النوع:{" "}
-                <span className="text-ink/80">
-                  {si.type === "consumable"
-                    ? "مستهلك"
-                    : si.type === "device"
-                    ? "جهاز"
-                    : si.type}
-                </span>
-              </span>
-              <span>
-                الوحدة: <span className="text-ink/80">{si.unit}</span>
-              </span>
-              <span>
-                وحدة المخزون: <span className="text-ink/80">{si.stock_unit}</span>
-              </span>
-              <span>
-                معامل التحويل: <span className="text-ink/80">{si.conversion_factor}</span>
-              </span>
-              <span>
-                الكمية المستخدمة:{" "}
-                <span className="text-primary-600">{si.quantity}</span>
-              </span>
-              <span>
-                السعر:{" "}
-                <span className="text-primary-600">{si.price} ج.م</span>
-              </span>
-              <span>
-                سعر البيع: <span className="text-ink/80">{si.selling_price}</span>
-              </span>
-              <span>
-                المتاح بالمخزن:{" "}
-                <span
-                  className={
-                    Number(si.current_stock) <= 5
-                      ? "text-coral-600"
-                      : "text-ink/80"
-                  }
-                >
-                  {si.current_stock} {si.stock_unit}
-                </span>
-              </span>
-              <span>
-                الحالة:{" "}
-                <span
-                  className={
-                    si.is_active ? "text-primary-600" : "text-coral-600"
-                  }
-                >
-                  {si.is_active ? "نشط" : "غير نشط"}
-                </span>
-              </span>
+        {/* بيانات الـ item كاملة - للعرض فقط */}
+        <div className="ms-6 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] font-bold text-ink/60">
+          <span>
+            وحدة المخزون: <span className="text-ink/80">{si.stock_unit}</span>
+          </span>
+          <span>
+            الكمية المستخدمة:{" "}
+            <span className="text-primary-600">{si.quantity}</span>
+          </span>
+          <span>
+            المتاح بالمخزن:{" "}
+            <span
+              className={
+                Number(si.current_stock) <= 5
+                  ? "text-coral-600"
+                  : "text-ink/80"
+              }
+            >
+              {si.current_stock} {si.stock_unit}
+            </span>
+          </span>
+        </div>
+      </label>
+    );
+  })}
             </div>
-          </label>
-        );
-      })}
-    </div>
-  </div>
-)}
+          </div>
+        )}
 
         <TextareaField
           label="ملاحظات"
