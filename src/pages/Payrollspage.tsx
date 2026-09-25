@@ -1,3 +1,5 @@
+
+
 // import { useState } from "react";
 // import { FiPlus, FiZap } from "react-icons/fi";
 // import useFetch from "@/hooks/useFetch";
@@ -12,8 +14,9 @@
 // import GeneratePayrollModal from "@/components/payroll/Generatepayrollmodal";
 // import PayrollDetailsModal from "@/components/payroll/Payrolldetailsmodal";
 // import PayPayrollModal from "@/components/payroll/Paypayrollmodal";
+// import PayrollPrintModal from "@/components/payroll/PayrollPrintModal";
 
-// const currentMonth = () => new Date().toISOString().slice(0, 7); // "2026-09"
+// const currentMonth = () => new Date().toISOString().slice(0, 7);
 
 // const PayrollsPage = () => {
 //   const [month, setMonth] = useState(currentMonth());
@@ -25,8 +28,11 @@
 //   const [toDelete, setToDelete] = useState<Payroll | null>(null);
 //   const [toApprove, setToApprove] = useState<Payroll | null>(null);
 
+//   // ✅ للطباعة
+//   const [toPrint, setToPrint] = useState<Payroll | null>(null);
+
 //   const { data, isLoading } = useFetch<PaginatedResponse<Payroll>>({
-//     queryKey: ["payrolls"],
+//     queryKey: ["payrolls", page, month],
 //     endpoint: "payrolls",
 //     params: { page, month },
 //     keepPrevious: true,
@@ -72,9 +78,13 @@
 //               disabled={generatingAll}
 //               onClick={() => generateAll({ month })}
 //             >
-//               <FiZap size={16} /> {generatingAll ? "جاري التوليد..." : "توليد رواتب الشهر بالكامل"}
+//               <FiZap size={16} />{" "}
+//               {generatingAll ? "جاري التوليد..." : "توليد رواتب الشهر بالكامل"}
 //             </button>
-//             <button className="btn-primary" onClick={() => setGenerateOpen(true)}>
+//             <button
+//               className="btn-primary"
+//               onClick={() => setGenerateOpen(true)}
+//             >
 //               <FiPlus size={17} /> توليد راتب موظف
 //             </button>
 //           </div>
@@ -103,15 +113,34 @@
 //         onApprove={setToApprove}
 //         onPay={setToPay}
 //         onDelete={setToDelete}
+//         onPrint={setToPrint}   // ✅ جديد
 //       />
 
 //       <Pagination meta={meta} onPageChange={setPage} />
 
-//       <GeneratePayrollModal open={generateOpen} onClose={() => setGenerateOpen(false)} month={month} />
+//       <GeneratePayrollModal
+//         open={generateOpen}
+//         onClose={() => setGenerateOpen(false)}
+//         month={month}
+//       />
 
-//       <PayrollDetailsModal open={!!detailsId} onClose={() => setDetailsId(null)} payrollId={detailsId} />
+//       <PayrollDetailsModal
+//         open={!!detailsId}
+//         onClose={() => setDetailsId(null)}
+//         payrollId={detailsId}
+//       />
 
-//       <PayPayrollModal open={!!toPay} onClose={() => setToPay(null)} payroll={toPay} />
+//       <PayPayrollModal
+//         open={!!toPay}
+//         onClose={() => setToPay(null)}
+//         payroll={toPay}
+//       />
+
+//       <PayrollPrintModal
+//         open={!!toPrint}
+//         onClose={() => setToPrint(null)}
+//         payroll={toPrint}
+//       />
 
 //       <ConfirmDialog
 //         open={!!toApprove}
@@ -122,7 +151,9 @@
 //         title="تأكيد اعتماد الراتب"
 //         confirmLabel="اعتماد"
 //         loadingLabel="جاري الاعتماد..."
-//         message={`هل تريد اعتماد راتب "${toApprove?.user?.name ?? `موظف #${toApprove?.user_id}`}" عن شهر ${toApprove?.month}؟`}
+//         message={`هل تريد اعتماد راتب "${
+//           toApprove?.user?.name ?? `موظف #${toApprove?.user_id}`
+//         }" عن شهر ${toApprove?.month}؟`}
 //       />
 
 //       <ConfirmDialog
@@ -130,7 +161,9 @@
 //         onClose={() => setToDelete(null)}
 //         onConfirm={() => toDelete && deletePayroll(toDelete)}
 //         loading={deleting}
-//         message={`هل أنت متأكد من حذف مسير راتب "${toDelete?.user?.name ?? `موظف #${toDelete?.user_id}`}"؟`}
+//         message={`هل أنت متأكد من حذف مسير راتب "${
+//           toDelete?.user?.name ?? `موظف #${toDelete?.user_id}`
+//         }"؟`}
 //       />
 //     </div>
 //   );
@@ -140,6 +173,7 @@
 
 import { useState } from "react";
 import { FiPlus, FiZap } from "react-icons/fi";
+import { toast } from "react-toastify";
 import useFetch from "@/hooks/useFetch";
 import useMutate from "@/hooks/useMutate";
 import PageHeader from "@/components/shared/PageHeader";
@@ -156,9 +190,18 @@ import PayrollPrintModal from "@/components/payroll/PayrollPrintModal";
 
 const currentMonth = () => new Date().toISOString().slice(0, 7);
 
+// ✅ نوع الـ payload المرن
+type GenerateAllPayload =
+  | { month: string }
+  | { start_date: string; end_date: string };
+
 const PayrollsPage = () => {
   const [month, setMonth] = useState(currentMonth());
   const [page, setPage] = useState(1);
+
+  // ✅ state للفترة المخصصة
+  const [periodMode, setPeriodMode] = useState<"month" | "range">("month");
+  const [range, setRange] = useState({ start: "", end: "" });
 
   const [generateOpen, setGenerateOpen] = useState(false);
   const [detailsId, setDetailsId] = useState<number | null>(null);
@@ -204,6 +247,28 @@ const PayrollsPage = () => {
     onSuccess: () => setToDelete(null),
   });
 
+  // ✅ بناء الـ payload حسب الوضع المختار
+  const buildGeneratePayload = (): GenerateAllPayload | null => {
+    if (periodMode === "range") {
+      if (!range.start || !range.end) {
+        toast.error("من فضلك اختر تاريخ البداية والنهاية");
+        return null;
+      }
+      if (range.start > range.end) {
+        toast.error("تاريخ البداية لازم يكون قبل تاريخ النهاية");
+        return null;
+      }
+      return { start_date: range.start, end_date: range.end };
+    }
+    return { month };
+  };
+
+  const handleGenerateAll = () => {
+    const payload = buildGeneratePayload();
+    if (!payload) return;
+    generateAll(payload);
+  };
+
   return (
     <div>
       <PageHeader
@@ -214,10 +279,14 @@ const PayrollsPage = () => {
             <button
               className="btn-secondary"
               disabled={generatingAll}
-              onClick={() => generateAll({ month })}
+              onClick={handleGenerateAll}
             >
               <FiZap size={16} />{" "}
-              {generatingAll ? "جاري التوليد..." : "توليد رواتب الشهر بالكامل"}
+              {generatingAll
+                ? "جاري التوليد..."
+                : periodMode === "range"
+                  ? "توليد رواتب الفترة"
+                  : "توليد رواتب الشهر بالكامل"}
             </button>
             <button
               className="btn-primary"
@@ -229,18 +298,66 @@ const PayrollsPage = () => {
         }
       />
 
-      <div className="card mb-6 grid grid-cols-1 gap-4 p-4 sm:grid-cols-3">
-        <TextField
-          label="الشهر"
-          name="month"
-          type="month"
-          value={month}
-          onChange={(e) => {
-            setMonth(e.target.value);
-            setPage(1);
-          }}
-          disabled
-        />
+      <div className="card mb-6 flex flex-col gap-4 p-4">
+        {/* صف اختيار نوع الفترة */}
+        <div className="flex flex-wrap items-center gap-6">
+          <span className="text-sm font-bold text-ink">نوع الفترة:</span>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="periodMode"
+              checked={periodMode === "month"}
+              onChange={() => setPeriodMode("month")}
+            />
+            شهر كامل
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="periodMode"
+              checked={periodMode === "range"}
+              onChange={() => setPeriodMode("range")}
+            />
+            فترة مخصصة
+          </label>
+        </div>
+
+        {/* صف الحقول — يتغيّر حسب الاختيار */}
+        {periodMode === "month" ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <TextField
+              label="الشهر"
+              name="month"
+              type="month"
+              value={month}
+              onChange={(e) => {
+                setMonth(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <TextField
+              label="من تاريخ"
+              name="start_date"
+              type="date"
+              value={range.start}
+              onChange={(e) =>
+                setRange((r) => ({ ...r, start: e.target.value }))
+              }
+            />
+            <TextField
+              label="إلى تاريخ"
+              name="end_date"
+              type="date"
+              value={range.end}
+              onChange={(e) =>
+                setRange((r) => ({ ...r, end: e.target.value }))
+              }
+            />
+          </div>
+        )}
       </div>
 
       <PayrollsTable
@@ -251,7 +368,7 @@ const PayrollsPage = () => {
         onApprove={setToApprove}
         onPay={setToPay}
         onDelete={setToDelete}
-        onPrint={setToPrint}   // ✅ جديد
+        onPrint={setToPrint}
       />
 
       <Pagination meta={meta} onPageChange={setPage} />
