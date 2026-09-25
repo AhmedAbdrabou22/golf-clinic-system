@@ -1,7 +1,7 @@
 
 
 import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FiCalendar,
   FiPlus,
@@ -12,6 +12,8 @@ import {
   FiActivity,
   FiClock,
 } from "react-icons/fi";
+import {  FiPrinter } from "react-icons/fi";
+
 import useFetch from "@/hooks/useFetch";
 import StatusBadge from "@/components/shared/StatusBadge";
 import Loader from "@/components/shared/Loader";
@@ -21,6 +23,7 @@ import AppointmentStatusMenu from "@/components/appointments/AppointmentStatusMe
 import InvoiceCreateForm from "@/components/invoices/InvoiceCreateForm";
 import type { Appointment, FollowUp, PaginatedResponse } from "@/types";
 import { FOLLOW_UP_STATUSES, labelOf, toneOf } from "@/utils/constants";
+import PageHeader from "@/components/shared/PageHeader";
 
 const todayISO = () => new Date().toISOString().split("T")[0];
 
@@ -37,29 +40,28 @@ const dayLabel = (dateStr?: string) => {
 const ReceptionPage = () => {
   const [appointmentModalOpen, setAppointmentModalOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const navigate = useNavigate();
 
-  // ===== أقرب الحجوزات (اليوم وما بعده) =====
   const { data: apptData, isLoading: apptLoading } = useFetch<PaginatedResponse<Appointment>>({
     queryKey: ["appointments"],
     endpoint: "appointments",
     params: { page: 1 },
   });
 
-  // ===== المتابعات =====
-const { data: followUpData, isLoading: followUpLoading } = useFetch<PaginatedResponse<FollowUp>>({
-  queryKey: ["follow-ups"],
-  endpoint: "follow-ups",
-  params: { page: 1 },
-});
-const allFollowUps = followUpData?.data ?? (Array.isArray(followUpData) ? (followUpData as any) : []);
+  const { data: followUpData, isLoading: followUpLoading } = useFetch<PaginatedResponse<FollowUp>>({
+    queryKey: ["follow-ups"],
+    endpoint: "follow-ups",
+    params: { page: 1 },
+  });
+  const allFollowUps = followUpData?.data ?? (Array.isArray(followUpData) ? (followUpData as any) : []);
 
-const recentFollowUps = useMemo(
-  () =>
-    [...allFollowUps]
-      .sort((a, b) => (a.follow_up_date > b.follow_up_date ? 1 : -1))
-      .slice(0, 4),
-  [allFollowUps]
-);
+  const recentFollowUps = useMemo(
+    () =>
+      [...allFollowUps]
+        .sort((a, b) => (a.follow_up_date > b.follow_up_date ? 1 : -1))
+        .slice(0, 4),
+    [allFollowUps]
+  );
   const allAppointments = apptData?.data ?? (Array.isArray(apptData) ? (apptData as any) : []);
   const upcomingAppointments = useMemo(
     () =>
@@ -90,10 +92,17 @@ const recentFollowUps = useMemo(
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-4">
         {/* ===== تلتين الشاشة: فورم فاتورة جديدة ===== */}
         <div className="lg:col-span-3">
-          <h2 className="mb-3 flex items-center gap-2 font-display text-base font-extrabold text-ink">
-            <FiFileText className="text-primary-500" size={18} />
-            فاتورة جديدة
-          </h2>
+          <PageHeader
+            title="الفواتير"
+            subtitle="إدارة فواتير الكشف والجلسات والبيع المباشر"
+            action={
+              <button className="btn-primary" onClick={() => navigate("/invoices")}>
+                            <FiPrinter size={16} />
+
+                الفواتير (طباعه الفواتير)
+              </button>
+            }
+          />
           <InvoiceCreateForm />
         </div>
 
@@ -165,61 +174,61 @@ const recentFollowUps = useMemo(
 
           {/* كارت متابعات — هيتعمل لاحقًا */}
           {/* كارت المتابعات */}
-<div className="card flex flex-col p-5">
-  <div className="mb-4 flex items-center justify-between">
-    <h2 className="flex items-center gap-2 font-display text-base font-extrabold text-ink">
-      <FiActivity className="text-primary-500" size={18} />
-      متابعات
-    </h2>
-    <StatusBadge label={`الكل: ${allFollowUps.length}`} tone="primary" />
-  </div>
+          <div className="card flex flex-col p-5">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 font-display text-base font-extrabold text-ink">
+                <FiActivity className="text-primary-500" size={18} />
+                متابعات
+              </h2>
+              <StatusBadge label={`الكل: ${allFollowUps.length}`} tone="primary" />
+            </div>
 
-  <div className="flex-1 space-y-2.5">
-    {followUpLoading ? (
-      <Loader />
-    ) : recentFollowUps.length === 0 ? (
-      <EmptyState title="لا توجد متابعات" hint="أضف أول متابعة لمريض." />
-    ) : (
-      recentFollowUps.map((f: FollowUp) => (
-        <div
-          key={f.id}
-          className="flex items-center justify-between gap-2 rounded-xl bg-mint-100/70 px-3.5 py-2.5"
-        >
-          <div className="min-w-0">
-            <p className="flex items-center gap-1.5 truncate font-bold text-ink">
-              <FiUser size={13} className="shrink-0 text-primary-500" />
-              {f.patient?.name ?? `#${f.patient_id}`}
-            </p>
-            <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink/45">
-              <FiClock size={12} className="shrink-0" />
-              {dayLabel(f.follow_up_date)}
-              <StatusBadge
-                label={labelOf(FOLLOW_UP_STATUSES, f.status)}
-                tone={toneOf(FOLLOW_UP_STATUSES, f.status)}
-              />
-            </p>
+            <div className="flex-1 space-y-2.5">
+              {followUpLoading ? (
+                <Loader />
+              ) : recentFollowUps.length === 0 ? (
+                <EmptyState title="لا توجد متابعات" hint="أضف أول متابعة لمريض." />
+              ) : (
+                recentFollowUps.map((f: FollowUp) => (
+                  <div
+                    key={f.id}
+                    className="flex items-center justify-between gap-2 rounded-xl bg-mint-100/70 px-3.5 py-2.5"
+                  >
+                    <div className="min-w-0">
+                      <p className="flex items-center gap-1.5 truncate font-bold text-ink">
+                        <FiUser size={13} className="shrink-0 text-primary-500" />
+                        {f.patient?.name ?? `#${f.patient_id}`}
+                      </p>
+                      <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink/45">
+                        <FiClock size={12} className="shrink-0" />
+                        {dayLabel(f.follow_up_date)}
+                        <StatusBadge
+                          label={labelOf(FOLLOW_UP_STATUSES, f.status)}
+                          tone={toneOf(FOLLOW_UP_STATUSES, f.status)}
+                        />
+                      </p>
+                    </div>
+                    <Link
+                      to="/follow-ups"
+                      className="shrink-0 rounded-lg p-2 text-primary-600 hover:bg-white"
+                      aria-label="عرض المتابعة"
+                    >
+                      <FiEdit2 size={15} />
+                    </Link>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="mt-4 flex gap-2">
+              <Link to="/follow-ups" className="btn-secondary flex-1 !py-2 text-sm">
+                كل المتابعات
+              </Link>
+              <Link to="/follow-ups" className="btn-primary flex-1 !py-2 text-sm">
+                <FiPlus size={16} /> متابعة
+              </Link>
+            </div>
           </div>
-          <Link
-            to="/follow-ups"
-            className="shrink-0 rounded-lg p-2 text-primary-600 hover:bg-white"
-            aria-label="عرض المتابعة"
-          >
-            <FiEdit2 size={15} />
-          </Link>
-        </div>
-      ))
-    )}
-  </div>
-
-  <div className="mt-4 flex gap-2">
-    <Link to="/follow-ups" className="btn-secondary flex-1 !py-2 text-sm">
-      كل المتابعات
-    </Link>
-    <Link to="/follow-ups" className="btn-primary flex-1 !py-2 text-sm">
-      <FiPlus size={16} /> متابعة 
-    </Link>
-  </div>
-</div>
         </div>
       </div>
 

@@ -181,7 +181,7 @@ const ContractFormModal = ({ open, onClose, contract }: Props) => {
 
   const { data: servicesData } = useFetch<any>({
     queryKey: ["services-list"],
-    endpoint: "services",
+    endpoint: "services?per_page=-1",
     enabled: open && contractType === "doctor" && doctorMode === "fixed_per_service",
   });
   const servicesList: any[] = servicesData?.data ?? (Array.isArray(servicesData) ? servicesData : []);
@@ -377,7 +377,7 @@ const ContractFormModal = ({ open, onClose, contract }: Props) => {
                     </div>
                     <div className="w-32">
                       <TextField
-                        label="النسبة (0.05 = 5%)"
+                        label="النسبة"
                         name={`dept_pct_${idx}`}
                         type="number"
                         step="0.01"
