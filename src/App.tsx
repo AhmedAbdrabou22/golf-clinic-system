@@ -31,6 +31,8 @@ import PayrollsPage from "./pages/Payrollspage";
 import StaffContractsPage from "./pages/StaffContractsPage";
 import StaffContractFormPage from "./components/staff/StaffContractFormPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import ReportsPage from "./pages/ReportsPage";
+import ReportDetailPage from "./pages/ReportDetailPage";
 
 function App() {
   return (
@@ -51,7 +53,8 @@ function App() {
             <Route path="/staff/:id/edit" element={<StaffContractFormPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
-
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/reports/:key" element={<ReportDetailPage />} />
             <Route path="/reception" element={<ReceptionPage />} />
             <Route path="/invoices/new" element={<InvoiceCreatePage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
