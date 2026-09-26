@@ -41,17 +41,17 @@ const FollowUpsPage = () => {
       <PageHeader
         title="المتابعات"
         subtitle="متابعة المرضى بعد الكشف أو الجلسات"
-        action={
-          <button
-            className="btn-primary"
-            onClick={() => {
-              setSelected(null);
-              setFormOpen(true);
-            }}
-          >
-            <FiPlus size={17} /> متابعة جديدة
-          </button>
-        }
+        // action={
+        //   <button
+        //     className="btn-primary"
+        //     onClick={() => {
+        //       setSelected(null);
+        //       setFormOpen(true);
+        //     }}
+        //   >
+        //     <FiPlus size={17} /> متابعة جديدة
+        //   </button>
+        // }
       />
 
       <div className="card mb-6 grid grid-cols-1 gap-4 p-4 sm:grid-cols-3">

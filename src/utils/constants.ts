@@ -320,13 +320,15 @@ export const NAV_LINKS: NavLink[] = [
   { to: "/departments", label: "الأقسام", icon: FiLayers, group: "admin" },
   { to: "/services", label: "الخدمات", icon: FiTag, group: "admin" },
   { to: "/suppliers", label: "الموردين", icon: FiTruck, group: "inventory" },
+    { to: "/staff", label: "الموظفين(بالعقود والعملات)", icon: FiUserCheck, group: "admin" },
+
   { to: "/items", label: "المخزون", icon: FiPackage, group: "inventory" },
   { to: "/purchase-invoices", label: "فواتير الشراء", icon: FiShoppingCart, group: "inventory" },
   { to: "/expenses", label: "المصروفات والأرباح", icon: FiDollarSign, group: "admin" },
-  { to: "/contracts", label: "عقود وعمولات", icon: FiAward, group: "admin" },
   { to: "/payrolls", label: "الرواتب والمرتبات", icon: FiCreditCard, group: "admin" },
-  { to: "/staff", label: "الموظفين", icon: FiUserCheck, group: "admin" },
   { to: "/roles", label: "الأدوار والصلاحيات", icon: FiShield, group: "admin" },
+    { to: "/contracts", label: "عقود وعمولات", icon: FiAward, group: "admin" },
+
   { to: "/settings", label: "الإعدادات", icon: FiSettings, group: "admin" },
 ];
 

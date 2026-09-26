@@ -1,5 +1,4 @@
 
-
 import { useState } from "react";
 import { FiPlus } from "react-icons/fi";
 import useFetch from "@/hooks/useFetch";
@@ -11,6 +10,7 @@ import Pagination from "@/components/shared/Pagination";
 import PatientsTable from "@/components/patients/PatientsTable";
 import PatientFormModal from "@/components/patients/PatientFormModal";
 import type { Patient, PaginatedResponse } from "@/types";
+import PatientProfileModal from "@/components/patients/PatientProfileModal";
 
 const PatientsPage = () => {
   const [search, setSearch] = useState("");
@@ -19,8 +19,11 @@ const PatientsPage = () => {
   const [selected, setSelected] = useState<Patient | null>(null);
   const [toDelete, setToDelete] = useState<Patient | null>(null);
 
+  // ✅ state للبروفايل
+  const [profileId, setProfileId] = useState<number | null>(null);
+
   const { data, isLoading } = useFetch<PaginatedResponse<Patient>>({
-    queryKey: ["patients"],
+    queryKey: ["patients", page, search],
     endpoint: "patients",
     params: { page, ...(search ? { search } : {}) },
     keepPrevious: true,
@@ -74,11 +77,22 @@ const PatientsPage = () => {
           setFormOpen(true);
         }}
         onDelete={setToDelete}
+        onViewProfile={(p) => setProfileId(p.id)} // ✅ جديد
       />
 
       <Pagination meta={meta} onPageChange={setPage} />
 
-      <PatientFormModal open={formOpen} onClose={() => setFormOpen(false)} patient={selected} />
+      <PatientFormModal
+        open={formOpen}
+        onClose={() => setFormOpen(false)}
+        patient={selected}
+      />
+
+      <PatientProfileModal
+        open={!!profileId}
+        onClose={() => setProfileId(null)}
+        patientId={profileId}
+      />
 
       <ConfirmDialog
         open={!!toDelete}

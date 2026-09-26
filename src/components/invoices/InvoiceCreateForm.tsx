@@ -630,7 +630,7 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
               ملخص الفاتورة والدفع
             </h2>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <TextField
                 label="الخصم (ج.م)"
                 name="discount"
@@ -639,7 +639,7 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
                 value={form.discount}
                 onChange={(e) => setForm({ ...form, discount: e.target.value })}
               />
-            </div>
+            </div> */}
 
             <label className="flex items-center gap-2 text-sm font-bold text-ink">
               <input

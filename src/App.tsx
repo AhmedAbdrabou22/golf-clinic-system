@@ -28,6 +28,8 @@ import InvoiceCreatePage from "./pages/InvoiceCreatePage";
 import FollowPage from "./pages/FollowUpsPage";
 import ContractsPage from "./pages/Contractspage";
 import PayrollsPage from "./pages/Payrollspage";
+import StaffContractsPage from "./pages/StaffContractsPage";
+import StaffContractFormPage from "./components/staff/StaffContractFormPage";
 
 function App() {
   return (
@@ -42,7 +44,10 @@ function App() {
         <Route element={<RequireOpenShift />}>
           <Route element={<MainLayout />}>
             <Route path="/" element={<DashboardPage />} />
-            <Route path="/staff" element={<StaffPage />} />
+            {/* <Route path="/staff" element={<StaffPage />} /> */}
+            <Route path="/staff" element={<StaffContractsPage />} />
+            <Route path="/staff/new" element={<StaffContractFormPage />} />
+            <Route path="/staff/:id/edit" element={<StaffContractFormPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/reception" element={<ReceptionPage />} />
             <Route path="/invoices/new" element={<InvoiceCreatePage />} />
@@ -55,7 +60,7 @@ function App() {
             <Route path="/patients" element={<PatientsPage />} />
             <Route path="/appointments" element={<AppointmentsPage />} />
             <Route path="/shifts" element={<ShiftsPage />} />
-             <Route path="/follow-ups" element={<FollowPage />} />
+            <Route path="/follow-ups" element={<FollowPage />} />
             <Route path="/invoices" element={<InvoicesPage />} />
             <Route path="/expenses" element={<ExpensesPage />} />
             <Route path="/contracts" element={<ContractsPage />} />
