@@ -25,6 +25,9 @@ export interface ServiceCommission {
   service_id: number;
   commission_type: ServiceCommissionType;
   commission_value: number;
+  // New
+   doctor_service_price?: number;
+  is_laser?: boolean;
 }
 
 export type ContractTargetType = "doctor_income";

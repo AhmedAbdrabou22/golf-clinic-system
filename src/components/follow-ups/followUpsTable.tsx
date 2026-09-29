@@ -1,4 +1,4 @@
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiEye } from "react-icons/fi";
 import DataTable, { Column } from "@/components/shared/DataTable";
 import StatusBadge from "@/components/shared/StatusBadge";
 import { FOLLOW_UP_STATUSES, labelOf, toneOf } from "@/utils/constants";
@@ -9,16 +9,52 @@ interface Props {
   isLoading: boolean;
   onEdit: (f: FollowUp) => void;
   onDelete: (f: FollowUp) => void;
+  /** ✅ جديد — لما تدوس على اسم المريض أو أيقونة العين */
+  onViewPatientProfile?: (patientId: number) => void;
   startIndex?: number;
 }
 
-const FollowUpsTable = ({ followUps, isLoading, onEdit, onDelete, startIndex = 1 }: Props) => {
+const FollowUpsTable = ({
+  followUps,
+  isLoading,
+  onEdit,
+  onDelete,
+  onViewPatientProfile,
+  startIndex = 1,
+}: Props) => {
   const columns: Column<FollowUp>[] = [
     { header: "#", accessor: (_r, index) => startIndex + index },
     {
       header: "المريض",
       accessor: (r) => (
-        <span className="font-bold text-ink">{r.patient?.name ?? `#${r.patient_id}`}</span>
+        <div className="flex items-center gap-2">
+          {/* ✅ اسم المريض قابل للضغط */}
+          <button
+            type="button"
+            onClick={() => onViewPatientProfile?.(r.patient_id)}
+            disabled={!onViewPatientProfile}
+            className={`font-bold text-ink ${
+              onViewPatientProfile
+                ? "hover:text-primary-600 hover:underline cursor-pointer"
+                : "cursor-default"
+            }`}
+            title={onViewPatientProfile ? "عرض بروفايل المريض" : undefined}
+          >
+            {r.patient?.name ?? `#${r.patient_id}`}
+          </button>
+
+          {/* ✅ أيقونة العين */}
+          {onViewPatientProfile && (
+            <button
+              type="button"
+              onClick={() => onViewPatientProfile(r.patient_id)}
+              title="عرض بروفايل المريض"
+              className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-700"
+            >
+              <FiEye size={15} />
+            </button>
+          )}
+        </div>
       ),
     },
     { header: "الطبيب", accessor: (r) => r.doctor?.name ?? `#${r.doctor_id}` },

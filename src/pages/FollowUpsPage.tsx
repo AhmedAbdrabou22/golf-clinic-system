@@ -10,6 +10,7 @@ import { FOLLOW_UP_STATUSES } from "@/utils/constants";
 import type { FollowUp, PaginatedResponse } from "@/types";
 import FollowUpsTable from "@/components/follow-ups/followUpsTable";
 import FollowUpFormModal from "@/components/follow-ups/FollowUpFormModal";
+import { useNavigate } from "react-router-dom";
 
 const FollowUpsPage = () => {
   const [page, setPage] = useState(1);
@@ -17,6 +18,7 @@ const FollowUpsPage = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [selected, setSelected] = useState<FollowUp | null>(null);
   const [toDelete, setToDelete] = useState<FollowUp | null>(null);
+  const navigate = useNavigate();
 
   const { data, isLoading } = useFetch<PaginatedResponse<FollowUp>>({
     queryKey: ["follow-ups"],
@@ -77,6 +79,8 @@ const FollowUpsPage = () => {
           setFormOpen(true);
         }}
         onDelete={setToDelete}
+              onViewPatientProfile={(patientId) => navigate(`/patients/${patientId}`)} // ✅
+
       />
 
       <Pagination meta={meta} onPageChange={setPage} />

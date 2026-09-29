@@ -81,13 +81,23 @@ export interface InvoiceItemInput {
   service_items_ids?: ServiceItemInput[]; // ← بدل number[]
 }
 
+// export interface Setting {
+//   id: number;
+//   key?: string;
+//   name?: string;
+//   value: string;
+// }
+
+// src/types/index.ts (أو wherever Setting معرّف)
+
 export interface Setting {
   id: number;
-  key?: string;
-  name?: string;
+  key: string;
   value: string;
+  display_name?: string | null;   // ✅ جديد
+  type?: "text" | "number" | "boolean";
+  name?: string;                   // لو موجود في نسخ قديمة
 }
-
 // ==================== المخازن والمشتريات ====================
 export interface Supplier {
   id: number;
