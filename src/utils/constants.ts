@@ -334,7 +334,7 @@ export const NAV_LINKS: NavLink[] = [
     icon: FiCreditCard,
     group: "admin",
   },
-  { to: "/contracts", label: "عقود وعمولات", icon: FiAward, group: "admin" },
+  // { to: "/contracts", label: "عقود وعمولات", icon: FiAward, group: "admin" },
   {
     to: "/reports",
     label: "التقارير الماليه والتشغيليه",
@@ -468,11 +468,11 @@ export const DOCTOR_COMMISSION_MODES: {
     label: "عمولة ثابتة لكل خدمة",
     hint: "مبلغ ثابت بالجنيه أو نسبة محددة لكل خدمة على حدة (زي العلاج الطبيعي)",
   },
-  {
-    value: "flat_percentage",
-    label: "نسبة عامة من كل الخدمات",
-    hint: "نسبة مئوية واحدة تُطبق على إجمالي كل الكشوفات والخدمات (زي التغذية)",
-  },
+  // {
+  //   value: "flat_percentage",
+  //   label: "نسبة عامة من كل الخدمات",
+  //   hint: "نسبة مئوية واحدة تُطبق على إجمالي كل الكشوفات والخدمات (زي التغذية)",
+  // },
   {
     value: "target_escalation",
     label: "نسب + تارجت وتصعيد",

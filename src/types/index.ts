@@ -68,6 +68,7 @@ export interface Service {
   department?: Department;
 }
 export interface ServiceItemInput {
+  service_item_id:any;
   item_id: number;
   quantity: number;
   price: number;

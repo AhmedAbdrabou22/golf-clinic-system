@@ -945,6 +945,7 @@ import type {
   ServiceCommission,
   ServiceCommissionType,
 } from "@/utils/contractPayroll";
+import SearchableSelect from "../shared/SearchableSelect";
 
 type TabKey = "staff" | "contract";
 type DoctorMode = "" | "fixed_per_service" | "flat_percentage" | "target_escalation";
@@ -1327,7 +1328,7 @@ const StaffContractFormPage = () => {
     <div>
       <PageHeader
         title={pageTitle}
-        subtitle="بيانات الموظف والعقد كل واحد له API منفصل"
+        // subtitle="بيانات الموظف والعقد كل واحد له API منفصل"
         action={
           <button className="btn-secondary" onClick={() => navigate("/staff")}>
             <FiArrowRight size={16} /> رجوع للقائمة
@@ -1660,7 +1661,7 @@ const StaffContractFormPage = () => {
                     {serviceRows.map((row, idx) => (
                       <div key={row._key} className="flex items-end gap-2">
                         <div className="flex-1">
-                          <SelectField
+                          {/* <SelectField
                             label="الخدمة"
                             name={`service_${idx}`}
                             value={String(row.service_id || "")}
@@ -1671,7 +1672,18 @@ const StaffContractFormPage = () => {
                             }}
                             options={serviceOptions}
                             placeholder="اختر الخدمة"
-                          />
+                          /> */}
+                          <SearchableSelect
+            label="الخدمة"
+            value={row.service_id || null}
+            onChange={(val) => {
+              const next = [...serviceRows];
+              next[idx] = { ...row, service_id: Number(val) };
+              setServiceRows(next);
+            }}
+            options={serviceOptions}
+            placeholder="ابحث عن خدمة..."
+          />
                         </div>
                         <div className="w-36">
                           <SelectField
@@ -1785,7 +1797,7 @@ const StaffContractFormPage = () => {
                           className="flex flex-wrap items-end gap-2 rounded-lg border border-ink/10 p-2"
                         >
                           <div className="min-w-[180px] flex-1">
-                            <SelectField
+                            {/* <SelectField
                               label="الخدمة"
                               name={`service_${idx}`}
                               value={String(row.service_id || "")}
@@ -1796,7 +1808,18 @@ const StaffContractFormPage = () => {
                               }}
                               options={serviceOptions}
                               placeholder="اختر الخدمة"
-                            />
+                            /> */}
+                            <SearchableSelect
+    label="الخدمة"
+    value={row.service_id || null}
+    onChange={(val) => {
+      const next = [...serviceRows];
+      next[idx] = { ...row, service_id: Number(val) };
+      setServiceRows(next);
+    }}
+    options={serviceOptions}
+    placeholder="ابحث عن خدمة..."
+  />
                           </div>
 
                           <div className="w-32">
