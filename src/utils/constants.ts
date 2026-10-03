@@ -284,6 +284,7 @@ import {
   FiCreditCard,
 } from "react-icons/fi";
 import { SlUserFollowing } from "react-icons/sl";
+import { MdLocalOffer } from "react-icons/md";
 
 export interface NavLink {
   to: string;
@@ -299,12 +300,15 @@ export const NAV_LINKS: NavLink[] = [
   { to: "/appointments", label: "الحجوزات", icon: FiCalendar, group: "clinic" },
   { to: "/invoices", label: "الفواتير", icon: FiFileText, group: "clinic" },
   { to: "/shifts", label: "الشفتات", icon: FiClock, group: "clinic" },
+
   {
     to: "/follow-ups",
     label: "المتابعات",
     icon: SlUserFollowing,
     group: "clinic",
   },
+      { to: "/offers", label: "العروض", icon: MdLocalOffer, group: "clinic" },
+
   { to: "/departments", label: "الأقسام", icon: FiLayers, group: "admin" },
   { to: "/services", label: "الخدمات", icon: FiTag, group: "admin" },
   { to: "/suppliers", label: "الموردين", icon: FiTruck, group: "inventory" },

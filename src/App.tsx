@@ -34,6 +34,7 @@ import NotificationsPage from "./pages/NotificationsPage";
 import ReportsPage from "./pages/ReportsPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
 import PatientProfilePage from "./components/patients/PatientProfilePage";
+import OffersPage from "./pages/OffersPage";
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
             {/* <Route path="/staff" element={<StaffPage />} /> */}
             <Route path="/staff" element={<StaffContractsPage />} />
             <Route path="/staff/new" element={<StaffContractFormPage />} />
+            <Route path="/offers" element={<OffersPage />} />
             <Route path="/staff/:id/edit" element={<StaffContractFormPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
