@@ -139,7 +139,7 @@ const PackageFormModal = ({
       description: form.description,
       department_id: Number(form.department_id),
       type: form.type,
-      original_price: Number(form.original_price),
+      // original_price: Number(form.original_price),
       price: Number(form.price),
       validity_days: Number(form.validity_days),
       is_active: form.is_active,
@@ -148,7 +148,7 @@ const PackageFormModal = ({
         service_id: itemType === "service" ? Number(r.ref) : null,
         ...(itemType === "product" ? { product_id: Number(r.ref) } : {}),
         quantity: Number(r.quantity),
-        unit_price: Number(r.unit_price),
+        // unit_price: Number(r.unit_price),
         notes: r.notes || null,
       })),
     });
@@ -197,7 +197,7 @@ const PackageFormModal = ({
         </div>
 
         <div className="grid grid-cols-3 gap-3">
-          <TextField
+          {/* <TextField
             label={`السعر الأصلي (بنود: ${itemsTotal})`}
             name="original_price"
             type="number"
@@ -205,7 +205,7 @@ const PackageFormModal = ({
             required
             value={form.original_price}
             onChange={(e) => setForm({ ...form, original_price: e.target.value })}
-          />
+          /> */}
           <TextField
             label="سعر الباقة"
             name="package_price"
@@ -284,7 +284,7 @@ const PackageFormModal = ({
                 />
               </div>
               <div className={isPulses ? "col-span-6" : "col-span-6 md:col-span-2"}>
-                <TextField
+                {/* <TextField
                   label="سعر الوحدة"
                   name={`price-${idx}`}
                   type="number"
@@ -292,7 +292,7 @@ const PackageFormModal = ({
                   required
                   value={row.unit_price}
                   onChange={(e) => updateRow(idx, { unit_price: e.target.value })}
-                />
+                /> */}
               </div>
               <div className={isPulses ? "col-span-12" : "col-span-10 md:col-span-3"}>
                 <TextField
