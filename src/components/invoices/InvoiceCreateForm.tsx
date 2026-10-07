@@ -1,6 +1,6 @@
 
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FiPlus, FiTrash2, FiInfo, FiUser, FiTag, FiPackage } from "react-icons/fi";
 import { TextField, TextareaField } from "@/components/shared/FormField";
 import SearchableSelect from "@/components/shared/SearchableSelect";
@@ -67,6 +67,8 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
 
   const requiresDoctor = form.type !== "direct_sale";
   const allowsNurse = form.type === "session";
+  const isDirectSale = form.type === "direct_sale"; // ✅ جديد
+
 
   // ===== المرضى (مع بحث + pagination) =====
   const { data: patientData, isLoading: patientsLoading } = useFetch<
@@ -91,10 +93,21 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
   const doctors = staff.filter((s: Staff) => s.type === "doctor");
   const nurses = staff.filter((s: Staff) => s.type === "nurse");
 
+  // ✅ الطبيب المختار وقسمه
+const selectedDoctor = doctors.find((d: Staff) => String(d.id) === form.doctor_id);
+const doctorDepartmentId = selectedDoctor?.department_id ?? null;
+  // const { data: serviceData } = useFetch<{ data: Service[] }>({
+  //   queryKey: ["services"],
+  //   endpoint: "services?per_page=-1",
+  // });
   const { data: serviceData } = useFetch<{ data: Service[] }>({
-    queryKey: ["services"],
-    endpoint: "services?per_page=-1",
-  });
+  queryKey: ["services", doctorDepartmentId],
+  endpoint: "services",
+  params: {
+    per_page: -1,
+    ...(doctorDepartmentId ? { department_id: doctorDepartmentId } : {}),
+  },
+});
   const services =
     serviceData?.data ?? (Array.isArray(serviceData) ? (serviceData as any) : []);
 
@@ -122,6 +135,25 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
       onSuccess?.(saved);
     },
   });
+
+  useEffect(() => {
+  if (form.type === "direct_sale") {
+    setRows((prev) =>
+      prev.map((r) =>
+        r.item_type === "service"
+          ? {
+              ...r,
+              item_type: "product",
+              service_id: null,
+              service_items_ids: [],
+              product_id: r.product_id ?? null,
+              quantity: r.quantity || 1,
+            }
+          : r
+      )
+    );
+  }
+}, [form.type]);
 
   const findService = (id?: number | null) => services.find((s: Service) => s.id === id);
   const findProduct = (id?: number | null) => products.find((p: Item) => p.id === id);
@@ -352,7 +384,7 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
                 options={PAYMENT_METHODS}
               />
 
-              {requiresDoctor && (
+              {/* {requiresDoctor && (
                 <SearchableSelect
                   label="الطبيب"
                   value={form.doctor_id}
@@ -364,7 +396,39 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
                   placeholder="ابحث عن طبيب..."
                   required
                 />
-              )}
+              )} */}
+              {requiresDoctor && (
+  <SearchableSelect
+    label="الطبيب"
+    value={form.doctor_id}
+    onChange={(v) => {
+      const newDoctorId = String(v);
+      const oldDoctor = doctors.find((d: Staff) => String(d.id) === form.doctor_id);
+      const newDoctor = doctors.find((d: Staff) => String(d.id) === newDoctorId);
+
+      // ✅ لو القسم اتغير، نصفّر الخدمات المختارة في الصفوف
+      const oldDept = (oldDoctor as any)?.department_id ?? null;
+      const newDept = (newDoctor as any)?.department_id ?? null;
+      if (oldDept !== newDept) {
+        setRows((prev) =>
+          prev.map((r) => ({
+            ...r,
+            service_id: null,
+            service_items_ids: [],
+          }))
+        );
+      }
+
+      setForm({ ...form, doctor_id: newDoctorId });
+    }}
+    options={doctors.map((d: Staff) => ({
+      value: d.id,
+      label: d.name,
+    }))}
+    placeholder="ابحث عن طبيب..."
+    required
+  />
+)}
 
               {allowsNurse && (
                 <SearchableSelect
@@ -399,22 +463,27 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
                   <div className="grid grid-cols-12 items-end gap-2">
                     <div className="col-span-6 sm:col-span-3">
                       <SearchableSelect
-                        label="النوع"
-                        value={row.item_type}
-                        onChange={(v) =>
-                          updateRow(idx, {
-                            item_type: v as "service" | "product",
-                            service_id: null,
-                            product_id: null,
-                            service_items_ids: [],
-                            quantity: 1,
-                          })
-                        }
-                        options={[
-                          { value: "service", label: "خدمة" },
-                          { value: "product", label: "منتج / صنف" },
-                        ]}
-                      />
+  label="النوع"
+  value={isDirectSale ? "product" : row.item_type}
+  onChange={(v) =>
+    updateRow(idx, {
+      item_type: v as "service" | "product",
+      service_id: null,
+      product_id: null,
+      service_items_ids: [],
+      quantity: 1,
+    })
+  }
+  options={
+    isDirectSale
+      ? [{ value: "product", label: "منتج / صنف" }] // ✅ منتج بس
+      : [
+          { value: "service", label: "خدمة" },
+          { value: "product", label: "منتج / صنف" },
+        ]
+  }
+  disabled={isDirectSale} // ✅ اختياري — يمنع التغيير
+/>
                     </div>
 
                     <div
