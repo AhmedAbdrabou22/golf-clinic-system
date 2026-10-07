@@ -1477,7 +1477,7 @@ const StaffContractFormPage = () => {
       basic_salary: Number(form.basic_salary) || 0,
       is_active: form.is_active,
       department_id: form.department_id ? Number(form.department_id) : null,
-      achieved_target: form.achieved_target ? 1 : 0,
+      // achieved_target: form.achieved_target ? 1 : 0,
     };
     if (!isEditStaff || form.password) payload.password = form.password;
     saveStaff(payload);
@@ -1526,7 +1526,7 @@ const StaffContractFormPage = () => {
 
     if (contractType === "receptionist") {
       Object.assign(base, {
-        hourly_rate: num(contractForm.hourly_rate) ?? 0,
+        hourly_rate:  0,
         overtime_hour_rate: num(contractForm.overtime_hour_rate),
         late_deduction_rate_per_hour: num(contractForm.late_deduction_rate_per_hour),
         applies_department_commission: contractForm.applies_department_commission,
@@ -1578,7 +1578,7 @@ const StaffContractFormPage = () => {
         });
       } else if (doctorMode === "target_escalation") {
         Object.assign(base, {
-          hourly_rate: num(contractForm.hourly_rate),
+          hourly_rate: 0,
           has_target: contractForm.has_target,
           target_amount: num(contractForm.target_amount),
           target_type: "doctor_income", // ✅ ثابت — مخفي في الفورم
@@ -1667,14 +1667,14 @@ const StaffContractFormPage = () => {
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
               />
-              <TextField
+              {/* <TextField
                 label="البريد الإلكتروني"
                 name="email"
                 type="email"
                 dir="ltr"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
-              />
+              /> */}
               <TextField
                 label={isEditStaff ? "كلمة المرور (اتركها فارغة لعدم التغيير)" : "كلمة المرور"}
                 name="password"
@@ -1722,12 +1722,12 @@ const StaffContractFormPage = () => {
                 checked={form.is_active}
                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
               />
-              <CheckboxField
+              {/* <CheckboxField
                 label="حقق التارجت؟"
                 name="achieved_target"
                 checked={form.achieved_target}
                 onChange={(e) => setForm({ ...form, achieved_target: e.target.checked })}
-              />
+              /> */}
             </div>
             <div className="mt-2 flex gap-3">
               <button type="button" onClick={() => navigate("/staff")} className="btn-secondary flex-1">
@@ -1800,14 +1800,14 @@ const StaffContractFormPage = () => {
                       setContractForm({ ...contractForm, late_deduction_rate_per_hour: e.target.value })
                     }
                   />
-                  <TextField
-                    label="hourly_rate (افتراضي 0)"
-                    name="hourly_rate"
-                    type="number"
-                    step="0.01"
-                    value={contractForm.hourly_rate}
-                    onChange={(e) => setContractForm({ ...contractForm, hourly_rate: e.target.value })}
-                  />
+                    {/* <TextField
+                      label="hourly_rate (افتراضي 0)"
+                      name="hourly_rate"
+                      type="number"
+                      step="0.01"
+                      value={contractForm.hourly_rate}
+                      onChange={(e) => setContractForm({ ...contractForm, hourly_rate: e.target.value })}
+                    /> */}
                 </div>
 
                 <label className="flex items-center gap-2 text-sm font-bold text-ink">

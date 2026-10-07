@@ -12,8 +12,12 @@ interface Props {
 }
 
 const StaffTable = ({ staff, isLoading, onEdit, onDelete }: Props) => {
+  // ✅ نشيل الموظف اللي id === 1
+  const visibleStaff = staff.filter((s) => Number(s.id) !== 1);
+
   const columns: Column<Staff>[] = [
-    { header: "#", accessor: (r) => r.id },
+    // ✅ ترتيب عادي بدل الـ id
+    { header: "#", accessor: (_r, idx) => (idx ?? 0) + 1 },
     { header: "الاسم", accessor: (r) => <span className="font-bold text-ink">{r.name}</span> },
     { header: "الهاتف", accessor: (r) => <span dir="ltr">{r.phone}</span> },
     { header: "الوظيفة", accessor: (r) => labelOf(STAFF_TYPES, r.type) },
@@ -45,7 +49,7 @@ const StaffTable = ({ staff, isLoading, onEdit, onDelete }: Props) => {
   return (
     <DataTable
       columns={columns}
-      rows={staff}
+      rows={visibleStaff}
       isLoading={isLoading}
       rowKey={(r) => r.id}
       emptyTitle="لا يوجد موظفين بعد"
