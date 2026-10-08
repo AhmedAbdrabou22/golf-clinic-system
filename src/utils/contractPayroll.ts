@@ -92,7 +92,8 @@ export interface Payroll {
   user_id: number;
   user?: { id: number; name: string } | null;
   month: string; // "2026-09"
-
+start_date:any;
+end_date:any;
   base_salary?: number | null;
   commissions_total?: number | null;
   overtime_total?: number | null;

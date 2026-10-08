@@ -17,7 +17,7 @@ interface Props {
 const money = (n?: number | null) => `${Number(n ?? 0).toFixed(2)} ج.م`;
 
 const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
-  const [form, setForm] = useState({ other_allowances: "", deductions: "", notes: "" });
+  const [form, setForm] = useState({ other_allowances: "", deductions: "", notes: "", total_working_hours: "" });
 
   const { data, isLoading } = useFetch<ApiEnvelope<any> | any>({
     queryKey: ["payroll-details", payrollId],
@@ -32,6 +32,7 @@ const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
         other_allowances: payroll.other_allowances != null ? String(payroll.other_allowances) : "",
         deductions: payroll.deductions != null ? String(payroll.deductions) : "",
         notes: payroll.notes ?? "",
+        total_working_hours: payroll.total_working_hours != null ? String(payroll.total_working_hours) : "",
       });
     }
   }, [open, payroll?.id]);
@@ -50,6 +51,7 @@ const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
       other_allowances: form.other_allowances ? Number(form.other_allowances) : 0,
       deductions: form.deductions ? Number(form.deductions) : 0,
       notes: form.notes || null,
+      total_working_hours: form.total_working_hours ? Number(form.total_working_hours) : 0,
     });
   };
 
@@ -169,6 +171,14 @@ const PayrollDetailsModal = ({ open, onClose, payrollId }: Props) => {
                   step="0.01"
                   value={form.deductions}
                   onChange={(e) => setForm({ ...form, deductions: e.target.value })}
+                />
+                <TextField
+                  label="عدد ساعات العمل"
+                  name="total_working_hours"
+                  type="number"
+                  step="0.01"
+                  value={form.total_working_hours}
+                  onChange={(e) => setForm({ ...form, total_working_hours: e.target.value })}
                 />
               </div>
               <TextareaField
