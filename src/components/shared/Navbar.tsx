@@ -1,7 +1,17 @@
 
-// import { useState } from "react";
+
+// import { useEffect, useState } from "react";
 // import { NavLink, useNavigate } from "react-router-dom";
-// import { FiChevronDown, FiLogOut, FiMenu, FiX, FiUser, FiClock, FiStopCircle, FiBell } from "react-icons/fi";
+// import {
+//   FiChevronDown,
+//   FiLogOut,
+//   FiMenu,
+//   FiX,
+//   FiUser,
+//   FiClock,
+//   FiStopCircle,
+//   FiBell,
+// } from "react-icons/fi";
 // import { useAuth } from "@/context/AuthContext";
 // import { NAV_LINKS, STAFF_TYPES } from "@/utils/constants";
 // import ShiftTimer from "@/components/shifts/ShiftTimer";
@@ -15,7 +25,9 @@
 // ];
 
 // const Navbar = () => {
-//   const { user, logout, activeShift, setActiveShift } = useAuth();
+//   // const { user, logout, activeShift, setActiveShift } = useAuth();
+//   const { user, logout, activeShift, setActiveShift, can } = useAuth();
+
 //   const navigate = useNavigate();
 //   const [openGroup, setOpenGroup] = useState<string | null>(null);
 //   const [mobileOpen, setMobileOpen] = useState(false);
@@ -23,6 +35,21 @@
 //   const [closeShiftOpen, setCloseShiftOpen] = useState(false);
 
 //   const staffTypeLabel = STAFF_TYPES.find((t) => t.value === user?.type)?.label;
+
+//   const allowedLinks = NAV_LINKS.filter((l) => can(l.permission));
+
+
+//   // ✅ منع الـ body من scroll لما قائمة الموبايل مفتوحة
+//   useEffect(() => {
+//     if (mobileOpen) {
+//       document.body.style.overflow = "hidden";
+//     } else {
+//       document.body.style.overflow = "";
+//     }
+//     return () => {
+//       document.body.style.overflow = "";
+//     };
+//   }, [mobileOpen]);
 
 //   const handleLogout = () => {
 //     logout();
@@ -39,7 +66,7 @@
 //       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
 //         {/* الشعار */}
 //         <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
-//           <span className="hidden font-display text-lg font-extrabold text-ink sm:block">
+//           <span className="font-display text-lg font-extrabold text-ink">
 //             الجولف كلينك
 //           </span>
 //         </NavLink>
@@ -69,10 +96,9 @@
 //                         key={link.to}
 //                         to={link.to}
 //                         className={({ isActive }) =>
-//                           `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold transition ${
-//                             isActive
-//                               ? "bg-primary-50 text-primary-600"
-//                               : "text-ink/70 hover:bg-mint-100"
+//                           `flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-bold transition ${isActive
+//                             ? "bg-primary-50 text-primary-600"
+//                             : "text-ink/70 hover:bg-mint-100"
 //                           }`
 //                         }
 //                       >
@@ -97,12 +123,18 @@
 //               className="group hidden items-center gap-2 rounded-xl border border-primary-100 bg-primary-50 px-3 py-1.5 text-primary-700 transition hover:border-coral-500/30 hover:bg-coral-500/5 sm:flex"
 //               title="دوس لإغلاق الشفت"
 //             >
-//               <FiClock size={15} className="text-primary-500 group-hover:text-coral-500" />
+//               <FiClock
+//                 size={15}
+//                 className="text-primary-500 group-hover:text-coral-500"
+//               />
 //               <ShiftTimer
 //                 startTime={activeShift.start_time}
 //                 className="text-xs font-extrabold tabular-nums"
 //               />
-//               <FiStopCircle size={15} className="text-primary-400 group-hover:text-coral-500" />
+//               <FiStopCircle
+//                 size={15}
+//                 className="text-primary-400 group-hover:text-coral-500"
+//               />
 //             </button>
 //           )}
 
@@ -116,7 +148,9 @@
 //               className="flex items-center gap-2 rounded-xl border border-ink/10 py-1.5 pe-1.5 ps-3 text-sm font-bold text-ink/80 transition hover:bg-mint-100"
 //             >
 //               <span className="hidden text-start md:block">
-//                 <span className="block leading-tight">{user?.name ?? "مستخدم"}</span>
+//                 <span className="block leading-tight">
+//                   {user?.name ?? "مستخدم"}
+//                 </span>
 //                 <span className="block text-[11px] font-medium text-ink/40">
 //                   {staffTypeLabel}
 //                 </span>
@@ -151,68 +185,88 @@
 
 //       {/* التنقل - Mobile */}
 //       {mobileOpen && (
-//         <nav className="border-t border-ink/10 bg-white px-4 py-3 lg:hidden">
-//           {/* عداد الشفت + إغلاقه على الموبايل */}
-//           {activeShift && (
+//         <>
+//           {/* ✅ overlay خلفي — يدوس عليه يقفل القائمة */}
+//           <div
+//             className="fixed inset-0 top-16 z-30 bg-ink/30 lg:hidden"
+//             onClick={() => setMobileOpen(false)}
+//             aria-hidden="true"
+//           />
+
+//           {/* ✅ القائمة نفسها — fixed بارتفاع باقي الشاشة + scroll جواها */}
+//           <nav className="fixed inset-x-0 top-16 bottom-0 z-30 overflow-y-auto border-t border-ink/10 bg-white px-4 py-3 lg:hidden">
+//             {/* عداد الشفت + إغلاقه على الموبايل */}
+//             {activeShift && (
+//               <button
+//                 type="button"
+//                 onClick={() => {
+//                   setMobileOpen(false);
+//                   setCloseShiftOpen(true);
+//                 }}
+//                 className="mb-3 flex w-full items-center justify-between rounded-lg bg-primary-50 px-3 py-2.5 text-primary-700"
+//               >
+//                 <span className="flex items-center gap-2 text-sm font-bold">
+//                   <FiClock size={16} />
+//                   الشفت شغال
+//                 </span>
+//                 <span className="flex items-center gap-2">
+//                   <ShiftTimer
+//                     startTime={activeShift.start_time}
+//                     className="text-sm font-extrabold tabular-nums"
+//                   />
+//                   <FiStopCircle size={16} />
+//                 </span>
+//               </button>
+//             )}
+
+//             {GROUPS.map((group) => (
+//               <div key={group.key} className="mb-3 last:mb-0">
+//                 <p className="mb-1.5 px-1 text-xs font-extrabold text-ink/35">
+//                   {group.label}
+//                 </p>
+//                 <div className="flex flex-col gap-0.5">
+//                   {NAV_LINKS.filter((l) => l.group === group.key).map(
+//                     (link) => (
+//                       <NavLink
+//                         key={link.to}
+//                         to={link.to}
+//                         onClick={() => setMobileOpen(false)}
+//                         className={({ isActive }) =>
+//                           `flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold ${isActive
+//                             ? "bg-primary-50 text-primary-600"
+//                             : "text-ink/70"
+//                           }`
+//                         }
+//                       >
+//                         <link.icon size={17} />
+//                         {link.label}
+//                       </NavLink>
+//                     )
+//                   )}
+//                 </div>
+//               </div>
+//             ))}
+
 //             <button
-//               type="button"
 //               onClick={() => {
 //                 setMobileOpen(false);
-//                 setCloseShiftOpen(true);
+//                 navigate("/notifications");
 //               }}
-//               className="mb-3 flex w-full items-center justify-between rounded-lg bg-primary-50 px-3 py-2.5 text-primary-700"
+//               className="mt-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold text-ink/70"
 //             >
-//               <span className="flex items-center gap-2 text-sm font-bold">
-//                 <FiClock size={16} />
-//                 الشفت شغال
-//               </span>
-//               <span className="flex items-center gap-2">
-//                 <ShiftTimer startTime={activeShift.start_time} className="text-sm font-extrabold tabular-nums" />
-//                 <FiStopCircle size={16} />
-//               </span>
+//               <FiBell size={17} />
+//               الإشعارات
 //             </button>
-//           )}
 
-//           {GROUPS.map((group) => (
-//             <div key={group.key} className="mb-3 last:mb-0">
-//               <p className="mb-1.5 px-1 text-xs font-extrabold text-ink/35">{group.label}</p>
-//               <div className="flex flex-col gap-0.5">
-//                 {NAV_LINKS.filter((l) => l.group === group.key).map((link) => (
-//                   <NavLink
-//                     key={link.to}
-//                     to={link.to}
-//                     onClick={() => setMobileOpen(false)}
-//                     className={({ isActive }) =>
-//                       `flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold ${
-//                         isActive ? "bg-primary-50 text-primary-600" : "text-ink/70"
-//                       }`
-//                     }
-//                   >
-//                     <link.icon size={17} />
-//                     {link.label}
-//                   </NavLink>
-//                 ))}
-//               </div>
-//             </div>
-//           ))}
-//           <button
-//             onClick={() => {
-//               setMobileOpen(false);
-//               navigate("/notifications");
-//             }}
-//             className="mt-1 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold text-ink/70"
-//           >
-//             <FiBell size={17} />
-//             الإشعارات
-//           </button>
-//           <button
-//             onClick={handleLogout}
-//             className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold text-coral-600"
-//           >
-//             <FiLogOut size={17} />
-//             تسجيل الخروج
-//           </button>
-//         </nav>
+//             <button
+//               onClick={handleLogout}
+//               className="mt-2 flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-bold text-coral-600"
+//             >
+//               <FiLogOut size={17} />
+//               تسجيل الخروج
+//             </button>
+//           </nav>
+//         </>
 //       )}
 
 //       <ShiftCloseModal
@@ -226,6 +280,8 @@
 // };
 
 // export default Navbar;
+
+
 
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -252,7 +308,8 @@ const GROUPS: { key: "clinic" | "inventory" | "admin"; label: string }[] = [
 ];
 
 const Navbar = () => {
-  const { user, logout, activeShift, setActiveShift } = useAuth();
+  const { user, logout, activeShift, setActiveShift, can } = useAuth();
+
   const navigate = useNavigate();
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -260,6 +317,9 @@ const Navbar = () => {
   const [closeShiftOpen, setCloseShiftOpen] = useState(false);
 
   const staffTypeLabel = STAFF_TYPES.find((t) => t.value === user?.type)?.label;
+
+  // الروابط المسموحة للمستخدم الحالي فقط
+  const allowedLinks = NAV_LINKS.filter((l) => can(l.permission));
 
   // ✅ منع الـ body من scroll لما قائمة الموبايل مفتوحة
   useEffect(() => {
@@ -287,16 +347,18 @@ const Navbar = () => {
     <header className="sticky top-0 z-40 bg-white shadow-card">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
         {/* الشعار */}
-       <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
-  <span className="font-display text-lg font-extrabold text-ink">
-    الجولف كلينك
-  </span>
-</NavLink>
+        <NavLink to="/" className="flex shrink-0 items-center gap-2.5">
+          <span className="font-display text-lg font-extrabold text-ink">
+            الجولف كلينك
+          </span>
+        </NavLink>
 
         {/* التنقل - Desktop */}
         <nav className="hidden items-center gap-1 lg:flex">
           {GROUPS.map((group) => {
-            const links = NAV_LINKS.filter((l) => l.group === group.key);
+            const links = allowedLinks.filter((l) => l.group === group.key);
+            if (links.length === 0) return null; // نخفي المجموعة لو فاضية
+
             return (
               <div
                 key={group.key}
@@ -442,14 +504,17 @@ const Navbar = () => {
               </button>
             )}
 
-            {GROUPS.map((group) => (
-              <div key={group.key} className="mb-3 last:mb-0">
-                <p className="mb-1.5 px-1 text-xs font-extrabold text-ink/35">
-                  {group.label}
-                </p>
-                <div className="flex flex-col gap-0.5">
-                  {NAV_LINKS.filter((l) => l.group === group.key).map(
-                    (link) => (
+            {GROUPS.map((group) => {
+              const links = allowedLinks.filter((l) => l.group === group.key);
+              if (links.length === 0) return null; // نخفي المجموعة لو فاضية
+
+              return (
+                <div key={group.key} className="mb-3 last:mb-0">
+                  <p className="mb-1.5 px-1 text-xs font-extrabold text-ink/35">
+                    {group.label}
+                  </p>
+                  <div className="flex flex-col gap-0.5">
+                    {links.map((link) => (
                       <NavLink
                         key={link.to}
                         to={link.to}
@@ -465,11 +530,11 @@ const Navbar = () => {
                         <link.icon size={17} />
                         {link.label}
                       </NavLink>
-                    )
-                  )}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             <button
               onClick={() => {

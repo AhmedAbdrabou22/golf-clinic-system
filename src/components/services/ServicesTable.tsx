@@ -7,7 +7,8 @@ import type { Service } from "@/types";
 interface Props {
   services: Service[];
   isLoading: boolean;
-  startIndex?: number;   // ✅ جديد — رقم أول صف في الصفحة الحالية
+  startIndex?: number;
+  isSearching?: boolean;
   onEdit: (s: Service) => void;
   onDelete: (s: Service) => void;
 }
@@ -22,13 +23,14 @@ const ServicesTable = ({
   services,
   isLoading,
   startIndex = 1,
+  isSearching = false,
   onEdit,
   onDelete,
 }: Props) => {
   const columns: Column<Service>[] = [
     {
       header: "#",
-      accessor: (r, idx) => startIndex + (idx ?? 0),   // ✅ ترقيم متسلسل
+      accessor: (r, idx) => startIndex + (idx ?? 0),
     },
     {
       header: "اسم الخدمة",
@@ -77,8 +79,12 @@ const ServicesTable = ({
       rows={services}
       isLoading={isLoading}
       rowKey={(r) => r.id}
-      emptyTitle="لا توجد خدمات بعد"
-      emptyHint="أضف أول خدمة يتم تقديمها بالعيادة."
+      emptyTitle={isSearching ? "لا توجد نتائج" : "لا توجد خدمات بعد"}
+      emptyHint={
+        isSearching
+          ? "جرّب كلمة بحث مختلفة."
+          : "أضف أول خدمة يتم تقديمها بالعيادة."
+      }
     />
   );
 };

@@ -26,10 +26,18 @@ export type StaffType =
   | "sterilization"
   | "accountant";
 
+// export interface Role {
+//   id: number;
+//   name: string;
+//   permissions?: string[];
+//   created_at?: string;
+// }
+export type PermissionItem = string | { id?: number; name: string };
+
 export interface Role {
   id: number;
   name: string;
-  permissions?: string[];
+  permissions?: PermissionItem[];
   created_at?: string;
 }
 
@@ -49,8 +57,10 @@ export interface Staff {
 }
 
 export interface AuthUser extends Staff {
-  permissions?: string[];
-    shift?: Shift | null;
+  // permissions?: string[];
+  //   shift?: Shift | null;
+  permissions?: (string | { name: string })[];
+  shift?: Shift | null;
 
 }
 

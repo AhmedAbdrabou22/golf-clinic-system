@@ -1,9 +1,10 @@
 
 
 
+
 // import React, { createContext, useContext, useEffect, useState } from "react";
 // import Cookies from "js-cookie";
-// import type { AuthUser } from "@/types";
+// import type { AuthUser, Shift } from "@/types";
 
 // const TOKEN_TTL_MS = 12 * 60 * 60 * 1000;
 
@@ -11,24 +12,24 @@
 //   user: AuthUser | null;
 //   token: string | null;
 //   isAuthenticated: boolean;
+//   activeShift: Shift | null;
 //   hasOpenShift: boolean;
 //   login: (user: AuthUser, token: string) => void;
 //   logout: () => void;
 //   setUser: (user: AuthUser) => void;
-//   setShiftOpen: (open: boolean) => void;
+//   setActiveShift: (shift: Shift | null) => void;
 // }
 
 // const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
+// const readStoredUser = (): AuthUser | null => {
+//   const stored = localStorage.getItem("user");
+//   return stored ? JSON.parse(stored) : null;
+// };
+
 // export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-//   const [user, setUserState] = useState<AuthUser | null>(() => {
-//     const stored = localStorage.getItem("user");
-//     return stored ? JSON.parse(stored) : null;
-//   });
+//   const [user, setUserState] = useState<AuthUser | null>(() => readStoredUser());
 //   const [token, setToken] = useState<string | null>(Cookies.get("token") ?? null);
-//   const [hasOpenShift, setHasOpenShift] = useState<boolean>(
-//     () => localStorage.getItem("shift_open") === "1"
-//   );
 
 //   useEffect(() => {
 //     setToken(Cookies.get("token") ?? null);
@@ -37,19 +38,15 @@
 //   const login = (userData: AuthUser, authToken: string) => {
 //     Cookies.set("token", authToken, { expires: new Date(Date.now() + TOKEN_TTL_MS) });
 //     localStorage.setItem("user", JSON.stringify(userData));
-//     localStorage.removeItem("shift_open");
 //     setUserState(userData);
 //     setToken(authToken);
-//     setHasOpenShift(false);
 //   };
 
 //   const logout = () => {
 //     Cookies.remove("token");
 //     localStorage.removeItem("user");
-//     localStorage.removeItem("shift_open");
 //     setUserState(null);
 //     setToken(null);
-//     setHasOpenShift(false);
 //   };
 
 //   const setUser = (userData: AuthUser) => {
@@ -57,11 +54,16 @@
 //     setUserState(userData);
 //   };
 
-//   const setShiftOpen = (open: boolean) => {
-//     if (open) localStorage.setItem("shift_open", "1");
-//     else localStorage.removeItem("shift_open");
-//     setHasOpenShift(open);
+//   const setActiveShift = (shift: Shift | null) => {
+//     setUserState((prev) => {
+//       if (!prev) return prev;
+//       const updated: AuthUser = { ...prev, shift };
+//       localStorage.setItem("user", JSON.stringify(updated));
+//       return updated;
+//     });
 //   };
+
+//   const activeShift = user?.shift?.status === "open" ? user.shift : null;
 
 //   return (
 //     <AuthContext.Provider
@@ -69,11 +71,12 @@
 //         user,
 //         token,
 //         isAuthenticated: !!token,
-//         hasOpenShift,
+//         activeShift,
+//         hasOpenShift: !!activeShift,
 //         login,
 //         logout,
 //         setUser,
-//         setShiftOpen,
+//         setActiveShift,
 //       }}
 //     >
 //       {children}
@@ -87,10 +90,7 @@
 //   return ctx;
 // };
 
-
-
-
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import Cookies from "js-cookie";
 import type { AuthUser, Shift } from "@/types";
 
@@ -102,6 +102,8 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   activeShift: Shift | null;
   hasOpenShift: boolean;
+  permissions: string[];
+  can: (permission?: string) => boolean;
   login: (user: AuthUser, token: string) => void;
   logout: () => void;
   setUser: (user: AuthUser) => void;
@@ -153,6 +155,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const activeShift = user?.shift?.status === "open" ? user.shift : null;
 
+  console.log("user",user);
+
+  // نحوّل الصلاحيات لمصفوفة أسماء بغض النظر عن شكلها
+  const permissions = useMemo<string[]>(
+    () => (user?.role?.permissions ?? []).map((p) => (typeof p === "string" ? p : p.name)),
+    [user]
+  );
+
+  const can = (permission?: string) => {
+    if (!permission) return true; // الرابط مفيهوش صلاحية مطلوبة
+    if (user?.type === "admin") return true; // المدير يشوف كل حاجة
+    return permissions.includes(permission);
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -161,6 +177,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: !!token,
         activeShift,
         hasOpenShift: !!activeShift,
+        permissions,
+        can,
         login,
         logout,
         setUser,
