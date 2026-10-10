@@ -35,6 +35,7 @@ import ReportsPage from "./pages/ReportsPage";
 import ReportDetailPage from "./pages/ReportDetailPage";
 import PatientProfilePage from "./components/patients/PatientProfilePage";
 import OffersPage from "./pages/OffersPage";
+import ReportsDashboardPage from "./pages/ReportsDashboardPage";
 
 function App() {
   return (
@@ -48,7 +49,7 @@ function App() {
 
         <Route element={<RequireOpenShift />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/" element={<ReportsDashboardPage />} />
             {/* <Route path="/staff" element={<StaffPage />} /> */}
             <Route path="/staff" element={<StaffContractsPage />} />
             <Route path="/staff/new" element={<StaffContractFormPage />} />

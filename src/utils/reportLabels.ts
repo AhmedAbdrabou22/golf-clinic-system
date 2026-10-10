@@ -254,6 +254,21 @@ export const REPORT_VALUE_LABELS: Record<string, string> = {
   direct_sale: "بيع مباشر",
   service: "خدمة",
   device: "جهاز",
+    shift_id: "رقم الشفت",
+  type_arabic: "وصف الحركة",
+  amount: "المبلغ",
+  notes: "ملاحظات",
+    // ===== سجل الحركات المالي =====
+  ledger_movements: "حركات السجل",
+  category: "الفئة",
+  party_name: "اسم الطرف",
+  doctor_or_staff: "الطبيب/الموظف",
+  recorded_by: "سُجّلت بواسطة",
+  debit: "مدين",
+  credit: "دائن",
+  net_flow: "صافي الحركة",
+  description: "الوصف",
+  running_balance: "الرصيد الجاري",
 };
 
 /**
