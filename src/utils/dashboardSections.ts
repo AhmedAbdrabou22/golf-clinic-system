@@ -34,13 +34,13 @@ export const DASHBOARD_SECTIONS: DashboardSection[] = [
     id: "expenses-details",
     reportKey: "expenses-salaries",
     title: "تفاصيل المصروفات",
-    keys: ["expenses", "expenses_details", "expense_details"],
+    keys: ["expenses", "expenses_details", "expense_details","itemized_expenses"],
   },
   {
     id: "payrolls",
     reportKey: "expenses-salaries",
     title: "تفاصيل كشوف المرتبات",
-    keys: ["payrolls", "payroll", "salaries", "payroll_details"],
+    keys: ["payrolls", "payroll", "salaries", "payroll_details","itemized_payrolls"],
   },
   {
     id: "transactions-ledger",
