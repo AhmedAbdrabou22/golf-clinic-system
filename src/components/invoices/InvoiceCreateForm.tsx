@@ -1,5 +1,6 @@
 
 
+
 // import { useEffect, useMemo, useState } from "react";
 // import { FiPlus, FiTrash2, FiInfo, FiUser, FiTag, FiPackage } from "react-icons/fi";
 // import { TextField, TextareaField } from "@/components/shared/FormField";
@@ -26,13 +27,17 @@
 //   price: number;
 // }
 
-// const emptyRow: any = {
-//   item_type: "service",
+// /**
+//  * ✅ دالة تبني صف جديد حسب نوع الفاتورة
+//  * لو بيع مباشر → product من أول لحظة (بدون ما نعتمد على useEffect)
+//  */
+// const makeEmptyRow = (isDirectSale: boolean): InvoiceItemInput => ({
+//   item_type: isDirectSale ? "product" : "service",
 //   service_id: null,
 //   product_id: null,
 //   quantity: 1,
 //   service_items_ids: [] as SelectedServiceItem[],
-// };
+// });
 
 // const initialForm = {
 //   patient_id: "",
@@ -52,7 +57,7 @@
 
 // const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
 //   const [form, setForm] = useState(initialForm);
-//   const [rows, setRows] = useState<InvoiceItemInput[]>([{ ...emptyRow }]);
+//   const [rows, setRows] = useState<InvoiceItemInput[]>([makeEmptyRow(false)]);
 //   const [patientModalOpen, setPatientModalOpen] = useState(false);
 //   const [partialPayment, setPartialPayment] = useState(false);
 
@@ -67,8 +72,7 @@
 
 //   const requiresDoctor = form.type !== "direct_sale";
 //   const allowsNurse = form.type === "session";
-//   const isDirectSale = form.type === "direct_sale"; // ✅ جديد
-
+//   const isDirectSale = form.type === "direct_sale"; // ✅
 
 //   // ===== المرضى (مع بحث + pagination) =====
 //   const { data: patientData, isLoading: patientsLoading } = useFetch<
@@ -94,20 +98,17 @@
 //   const nurses = staff.filter((s: Staff) => s.type === "nurse");
 
 //   // ✅ الطبيب المختار وقسمه
-// const selectedDoctor = doctors.find((d: Staff) => String(d.id) === form.doctor_id);
-// const doctorDepartmentId = selectedDoctor?.department_id ?? null;
-//   // const { data: serviceData } = useFetch<{ data: Service[] }>({
-//   //   queryKey: ["services"],
-//   //   endpoint: "services?per_page=-1",
-//   // });
+//   const selectedDoctor = doctors.find((d: Staff) => String(d.id) === form.doctor_id);
+//   const doctorDepartmentId = selectedDoctor?.department_id ?? null;
+
 //   const { data: serviceData } = useFetch<{ data: Service[] }>({
-//   queryKey: ["services", doctorDepartmentId],
-//   endpoint: "services",
-//   params: {
-//     per_page: -1,
-//     ...(doctorDepartmentId ? { department_id: doctorDepartmentId } : {}),
-//   },
-// });
+//     queryKey: ["services", doctorDepartmentId],
+//     endpoint: "services",
+//     params: {
+//       per_page: -1,
+//       ...(doctorDepartmentId ? { department_id: doctorDepartmentId } : {}),
+//     },
+//   });
 //   const services =
 //     serviceData?.data ?? (Array.isArray(serviceData) ? (serviceData as any) : []);
 
@@ -129,31 +130,12 @@
 //       setCreatedInvoice(saved);
 //       setPrintOpen(true);
 //       setForm(initialForm);
-//       setRows([{ ...emptyRow }]);
+//       setRows([makeEmptyRow(false)]);
 //       setPartialPayment(false);
 //       setPatientSearch("");
 //       onSuccess?.(saved);
 //     },
 //   });
-
-//   useEffect(() => {
-//   if (form.type === "direct_sale") {
-//     setRows((prev) =>
-//       prev.map((r) =>
-//         r.item_type === "service"
-//           ? {
-//               ...r,
-//               item_type: "product",
-//               service_id: null,
-//               service_items_ids: [],
-//               product_id: r.product_id ?? null,
-//               quantity: r.quantity || 1,
-//             }
-//           : r
-//       )
-//     );
-//   }
-// }, [form.type]);
 
 //   const findService = (id?: number | null) => services.find((s: Service) => s.id === id);
 //   const findProduct = (id?: number | null) => products.find((p: Item) => p.id === id);
@@ -161,7 +143,45 @@
 //   const updateRow = (idx: number, patch: Partial<InvoiceItemInput>) =>
 //     setRows((prev) => prev.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
 //   const removeRow = (idx: number) => setRows((prev) => prev.filter((_, i) => i !== idx));
-//   const addRow = () => setRows((prev) => [...prev, { ...emptyRow }]);
+
+//   // ✅ إضافة صف حسب نوع الفاتورة الحالي
+//   const addRow = () =>
+//     setRows((prev) => [...prev, makeEmptyRow(isDirectSale)]);
+
+//   /**
+//    * ✅ تغيير نوع الفاتورة
+//    * - بنحدّث form
+//    * - وبنحوّل الصفوف فورًا حسب النوع الجديد
+//    */
+//   const handleTypeChange = (v: string) => {
+//     const newType = v as Invoice["type"];
+//     const direct = newType === "direct_sale";
+
+//     setForm((f) => ({
+//       ...f,
+//       type: newType,
+//       doctor_id: "",
+//       nurse_id: "",
+//     }));
+
+//     setRows((prev) =>
+//       prev.map((r) => {
+//         if (direct) {
+//           // بيع مباشر → كل الصفوف product
+//           if (r.item_type === "product") return r;
+//           return {
+//             ...r,
+//             item_type: "product",
+//             service_id: null,
+//             service_items_ids: [],
+//             product_id: null,
+//             quantity: 1,
+//           };
+//         }
+//         return r; // للأنواع الأخرى سيبها زي ما هي
+//       })
+//     );
+//   };
 
 //   // ==== Multi select للأصناف المستهلكة ====
 //   const toggleServiceItem = (idx: number, si: any) => {
@@ -244,57 +264,102 @@
 //     (p: Patient) => String(p.id) === form.patient_id
 //   );
 
+//   // const handleSubmit = (e: React.FormEvent) => {
+//   //   e.preventDefault();
+//   //   mutate({
+//   //     patient_id: Number(form.patient_id),
+//   //     appointment_id: null,
+//   //     type: form.type,
+//   //     payment_method: form.payment_method,
+//   //     doctor_id: requiresDoctor && form.doctor_id ? Number(form.doctor_id) : null,
+//   //     nurse_id: allowsNurse && form.nurse_id ? Number(form.nurse_id) : null,
+//   //     discount: discountValue,
+//   //     ...(partialPayment ? { paid_amount: Number(form.paid_amount) || 0 } : {}),
+//   //     notes: form.notes,
+//   //     items: rows.flatMap((r) => {
+//   //       // ===== خدمة =====
+//   //       if (r.item_type === "service") {
+//   //         const selected: SelectedServiceItem[] = r.service_items_ids ?? [];
+
+//   //         // لو مفيش service_items مختارة → ابعت الخدمة الأم نفسها
+//   //         if (selected.length === 0) {
+//   //           return [
+//   //             {
+//   //               item_type: "service",
+//   //               service_id: Number(r.service_id),
+//   //               product_id: null,
+//   //               quantity: 1,
+//   //             },
+//   //           ];
+//   //         }
+
+//   //         // لو فيه مختارة → كل واحدة تبقى item مستقل
+//   //         return selected.map((x) => ({
+//   //           item_type: "service",
+//   //           service_id: Number(x.service_item_id),
+//   //           product_id: null,
+//   //           quantity: 1,
+//   //         }));
+//   //       }
+
+//   //       // ===== منتج =====
+//   //       return [
+//   //         {
+//   //           item_type: "product",
+//   //           service_id: null,
+//   //           product_id: Number(r.product_id),
+//   //           quantity: Number(r.quantity),
+//   //         },
+//   //       ];
+//   //     }),
+//   //   });
+//   // };
+
 //   const handleSubmit = (e: React.FormEvent) => {
-//     e.preventDefault();
-//     mutate({
-//       patient_id: Number(form.patient_id),
-//       appointment_id: null,
-//       type: form.type,
-//       payment_method: form.payment_method,
-//       doctor_id: requiresDoctor && form.doctor_id ? Number(form.doctor_id) : null,
-//       nurse_id: allowsNurse && form.nurse_id ? Number(form.nurse_id) : null,
-//       discount: discountValue,
-//       ...(partialPayment ? { paid_amount: Number(form.paid_amount) || 0 } : {}),
-//       notes: form.notes,
-//       items: rows.flatMap((r) => {
-//         // ===== خدمة =====
-//         if (r.item_type === "service") {
-//           const selected: SelectedServiceItem[] = r.service_items_ids ?? [];
+//   e.preventDefault();
+//   mutate({
+//     patient_id: Number(form.patient_id),
+//     appointment_id: null,
+//     type: form.type,
+//     payment_method: form.payment_method,
+//     doctor_id: requiresDoctor && form.doctor_id ? Number(form.doctor_id) : null,
+//     nurse_id: allowsNurse && form.nurse_id ? Number(form.nurse_id) : null,
+//     discount: discountValue,
+//     ...(partialPayment ? { paid_amount: Number(form.paid_amount) || 0 } : {}),
+//     notes: form.notes,
+//     items: rows.flatMap((r) => {
+//       // ===== خدمة =====
+//       if (r.item_type === "service") {
+//         const selected: SelectedServiceItem[] = r.service_items_ids ?? [];
 
-//           // لو مفيش service_items مختارة → ابعت الخدمة الأم نفسها
-//           if (selected.length === 0) {
-//             return [
-//               {
-//                 item_type: "service",
-//                 service_id: Number(r.service_id),
-//                 product_id: null,
-//                 quantity: 1,
-//               },
-//             ];
-//           }
-
-//           // لو فيه مختارة → كل واحدة تبقى item مستقل بـ service_id = service_item_id
-//           return selected.map((x) => ({
-//             item_type: "service",
-//             service_id: Number(x.service_item_id),
-//             product_id: null,
-//             quantity: 1,
-//           }));
-//         }
-
-//         // ===== منتج =====
+//         // ✅ نبعت صف واحد بس للخدمة
+//         // - service_id = id الخدمة الأم
+//         // - service_items_ids = array من service_item_id المختارة
 //         return [
 //           {
-//             item_type: "product",
-//             service_id: null,
-//             product_id: Number(r.product_id),
-//             quantity: Number(r.quantity),
+//             item_type: "service",
+//             service_id: Number(r.service_id),
+//             product_id: null,
+//             quantity: 1,
+//             ...(selected.length > 0
+//               ? { service_items_ids: selected.map((x) => Number(x.service_item_id)) }
+//               : {}),
 //           },
 //         ];
-//       }),
-//     });
-//   };
+//       }
 
+//       // ===== منتج =====
+//       return [
+//         {
+//           item_type: "product",
+//           service_id: null,
+//           product_id: Number(r.product_id),
+//           quantity: Number(r.quantity),
+//         },
+//       ];
+//     }),
+//   });
+// };
 //   return (
 //     <>
 //       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 xl:grid-cols-2">
@@ -361,17 +426,11 @@
 //                 </button>
 //               </div>
 
+//               {/* ✅ نوع الفاتورة — مربوط بـ handleTypeChange */}
 //               <SearchableSelect
 //                 label="نوع الفاتورة"
 //                 value={form.type}
-//                 onChange={(v) =>
-//                   setForm({
-//                     ...form,
-//                     type: v as Invoice["type"],
-//                     doctor_id: "",
-//                     nurse_id: "",
-//                   })
-//                 }
+//                 onChange={handleTypeChange}
 //                 options={INVOICE_TYPES}
 //               />
 
@@ -384,11 +443,34 @@
 //                 options={PAYMENT_METHODS}
 //               />
 
-//               {/* {requiresDoctor && (
+//               {requiresDoctor && (
 //                 <SearchableSelect
 //                   label="الطبيب"
 //                   value={form.doctor_id}
-//                   onChange={(v) => setForm({ ...form, doctor_id: String(v) })}
+//                   onChange={(v) => {
+//                     const newDoctorId = String(v);
+//                     const oldDoctor = doctors.find(
+//                       (d: Staff) => String(d.id) === form.doctor_id
+//                     );
+//                     const newDoctor = doctors.find(
+//                       (d: Staff) => String(d.id) === newDoctorId
+//                     );
+
+//                     // ✅ لو القسم اتغير، نصفّر الخدمات المختارة في الصفوف
+//                     const oldDept = (oldDoctor as any)?.department_id ?? null;
+//                     const newDept = (newDoctor as any)?.department_id ?? null;
+//                     if (oldDept !== newDept) {
+//                       setRows((prev) =>
+//                         prev.map((r) => ({
+//                           ...r,
+//                           service_id: null,
+//                           service_items_ids: [],
+//                         }))
+//                       );
+//                     }
+
+//                     setForm({ ...form, doctor_id: newDoctorId });
+//                   }}
 //                   options={doctors.map((d: Staff) => ({
 //                     value: d.id,
 //                     label: d.name,
@@ -396,39 +478,7 @@
 //                   placeholder="ابحث عن طبيب..."
 //                   required
 //                 />
-//               )} */}
-//               {requiresDoctor && (
-//   <SearchableSelect
-//     label="الطبيب"
-//     value={form.doctor_id}
-//     onChange={(v) => {
-//       const newDoctorId = String(v);
-//       const oldDoctor = doctors.find((d: Staff) => String(d.id) === form.doctor_id);
-//       const newDoctor = doctors.find((d: Staff) => String(d.id) === newDoctorId);
-
-//       // ✅ لو القسم اتغير، نصفّر الخدمات المختارة في الصفوف
-//       const oldDept = (oldDoctor as any)?.department_id ?? null;
-//       const newDept = (newDoctor as any)?.department_id ?? null;
-//       if (oldDept !== newDept) {
-//         setRows((prev) =>
-//           prev.map((r) => ({
-//             ...r,
-//             service_id: null,
-//             service_items_ids: [],
-//           }))
-//         );
-//       }
-
-//       setForm({ ...form, doctor_id: newDoctorId });
-//     }}
-//     options={doctors.map((d: Staff) => ({
-//       value: d.id,
-//       label: d.name,
-//     }))}
-//     placeholder="ابحث عن طبيب..."
-//     required
-//   />
-// )}
+//               )}
 
 //               {allowsNurse && (
 //                 <SearchableSelect
@@ -452,38 +502,45 @@
 //                 <FiTag className="text-primary-500" size={18} />
 //                 أصناف الفاتورة
 //               </h2>
-//               <button type="button" onClick={addRow} className="btn-ghost !px-3 !py-1.5 text-xs">
+//               <button
+//                 type="button"
+//                 onClick={addRow}
+//                 className="btn-ghost !px-3 !py-1.5 text-xs"
+//               >
 //                 <FiPlus size={14} /> إضافة صنف
 //               </button>
 //             </div>
 
 //             <div className="flex flex-col gap-3">
 //               {rowsWithTotals.map(({ row, svc, prod, subtotal }, idx) => (
-//                 <div key={idx} className="rounded-xl border border-ink/10 p-3.5">
+//                 <div
+//                   key={`${idx}-${row.item_type}`}
+//                   className="rounded-xl border border-ink/10 p-3.5"
+//                 >
 //                   <div className="grid grid-cols-12 items-end gap-2">
 //                     <div className="col-span-6 sm:col-span-3">
 //                       <SearchableSelect
-//   label="النوع"
-//   value={isDirectSale ? "product" : row.item_type}
-//   onChange={(v) =>
-//     updateRow(idx, {
-//       item_type: v as "service" | "product",
-//       service_id: null,
-//       product_id: null,
-//       service_items_ids: [],
-//       quantity: 1,
-//     })
-//   }
-//   options={
-//     isDirectSale
-//       ? [{ value: "product", label: "منتج / صنف" }] // ✅ منتج بس
-//       : [
-//           { value: "service", label: "خدمة" },
-//           { value: "product", label: "منتج / صنف" },
-//         ]
-//   }
-//   disabled={isDirectSale} // ✅ اختياري — يمنع التغيير
-// />
+//                         label="النوع"
+//                         value={isDirectSale ? "product" : row.item_type}
+//                         onChange={(v) =>
+//                           updateRow(idx, {
+//                             item_type: v as "service" | "product",
+//                             service_id: null,
+//                             product_id: null,
+//                             service_items_ids: [],
+//                             quantity: 1,
+//                           })
+//                         }
+//                         options={
+//                           isDirectSale
+//                             ? [{ value: "product", label: "منتج / صنف" }] // ✅ منتج بس
+//                             : [
+//                                 { value: "service", label: "خدمة" },
+//                                 { value: "product", label: "منتج / صنف" },
+//                               ]
+//                         }
+//                         disabled={isDirectSale} // ✅ يمنع التغيير
+//                       />
 //                     </div>
 
 //                     <div
@@ -531,7 +588,9 @@
 //                           type="number"
 //                           min={1}
 //                           value={row.quantity}
-//                           onChange={(e) => updateRow(idx, { quantity: Number(e.target.value) })}
+//                           onChange={(e) =>
+//                             updateRow(idx, { quantity: Number(e.target.value) })
+//                           }
 //                         />
 //                       </div>
 //                     )}
@@ -559,7 +618,8 @@
 //                   {svc && svc.items && svc.items.length > 0 && (
 //                     <div className="mt-2.5 rounded-lg bg-mint-100/70 px-3 py-2.5">
 //                       <p className="mb-2 flex items-center gap-1 text-xs font-bold text-primary-600">
-//                         <FiInfo size={13} /> الأصناف المستهلكة في هذه الخدمة (اختر ما تم استخدامه فعليًا):
+//                         <FiInfo size={13} /> الأصناف المستهلكة في هذه الخدمة (اختر ما
+//                         تم استخدامه فعليًا):
 //                       </p>
 //                       <div className="flex flex-col gap-2">
 //                         {svc.items.map((si: any) => {
@@ -588,32 +648,17 @@
 //                               </label>
 
 //                               <div className="flex items-center gap-1">
-//                                 <span className="text-[11px] font-bold text-ink/50">الكميه بالمللي:</span>
-//                                 {/* <input
-//                                   type="number"
-//                                   min={0}
-//                                   disabled
-//                                   step="0.01"
-//                                   className="field-input w-20 !py-1 text-xs"
-//                                   value={displayQty}
-//                                   readOnly
-//                                 /> */}
+//                                 <span className="text-[11px] font-bold text-ink/50">
+//                                   الكميه بالمللي:
+//                                 </span>
 //                                 {displayQty}
-
 //                               </div>
 
 //                               <div className="flex items-center gap-1">
-//                                 <span className="text-[11px] font-bold text-ink/50">السعر:</span>
-//                                 {/* <input
-//                                   type="number"
-//                                   min={0}
-//                                   disabled
-//                                   step="0.01"
-//                                   className="field-input w-24 !py-1 text-xs"
-//                                   value={displayPrice}
-//                                   readOnly
-//                                 /> */}
-//                         {displayPrice}
+//                                 <span className="text-[11px] font-bold text-ink/50">
+//                                   السعر:
+//                                 </span>
+//                                 {displayPrice}
 //                               </div>
 
 //                               <span className="text-[11px] font-bold text-primary-600">
@@ -645,7 +690,10 @@
 //                         <FiInfo size={13} /> بيانات الخدمة:
 //                       </span>
 //                       <span>
-//                         القسم: <span className="text-ink/70">{svc.department?.name ?? "—"}</span>
+//                         القسم:{" "}
+//                         <span className="text-ink/70">
+//                           {svc.department?.name ?? "—"}
+//                         </span>
 //                       </span>
 //                       <span>
 //                         النوع الطبي:{" "}
@@ -658,7 +706,8 @@
 //                         </span>
 //                       </span>
 //                       <span>
-//                         السعر الأساسي: <span className="text-ink/70">{svc.price} ج.م</span>
+//                         السعر الأساسي:{" "}
+//                         <span className="text-ink/70">{svc.price} ج.م</span>
 //                       </span>
 //                     </div>
 //                   )}
@@ -669,7 +718,10 @@
 //                         <FiInfo size={13} /> بيانات المنتج:
 //                       </span>
 //                       <span>
-//                         النوع: <span className="text-ink/70">{labelOf(ITEM_TYPES, prod.type)}</span>
+//                         النوع:{" "}
+//                         <span className="text-ink/70">
+//                           {labelOf(ITEM_TYPES, prod.type)}
+//                         </span>
 //                       </span>
 //                       <span>
 //                         الوحدة: <span className="text-ink/70">{prod.unit}</span>
@@ -687,7 +739,8 @@
 //                         </span>
 //                       </span>
 //                       <span>
-//                         سعر البيع: <span className="text-ink/70">{prod.selling_price} ج.م</span>
+//                         سعر البيع:{" "}
+//                         <span className="text-ink/70">{prod.selling_price} ج.م</span>
 //                       </span>
 //                     </div>
 //                   )}
@@ -776,11 +829,19 @@
 //               )}
 //             </div>
 
-//             <button type="submit" disabled={isLoading} className="btn-primary w-full py-3">
+//             <button
+//               type="submit"
+//               disabled={isLoading}
+//               className="btn-primary w-full py-3"
+//             >
 //               {isLoading ? "جاري الحفظ..." : "حفظ الفاتورة"}
 //             </button>
 //             {onCancel && (
-//               <button type="button" onClick={onCancel} className="btn-secondary w-full py-3">
+//               <button
+//                 type="button"
+//                 onClick={onCancel}
+//                 className="btn-secondary w-full py-3"
+//               >
 //                 إلغاء
 //               </button>
 //             )}
@@ -807,9 +868,6 @@
 // };
 
 // export default InvoiceCreateForm;
-
-
-
 import { useEffect, useMemo, useState } from "react";
 import { FiPlus, FiTrash2, FiInfo, FiUser, FiTag, FiPackage } from "react-icons/fi";
 import { TextField, TextareaField } from "@/components/shared/FormField";
@@ -858,6 +916,8 @@ const initialForm = {
   paid_amount: "",
   notes: "",
 };
+
+const MAX_DISCOUNT_PERCENT = 20;
 
 interface InvoiceCreateFormProps {
   onSuccess?: (invoice?: Invoice) => void;
@@ -1063,7 +1123,13 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
   );
 
   const itemsTotal = rowsWithTotals.reduce((sum, r) => sum + r.subtotal, 0);
-  const discountValue = Number(form.discount) || 0;
+
+  // ✅ الخصم بقى نسبة مئوية (بحد أقصى MAX_DISCOUNT_PERCENT)
+  const discountPercent = Math.min(
+    Math.max(Number(form.discount) || 0, 0),
+    MAX_DISCOUNT_PERCENT
+  );
+  const discountValue = (itemsTotal * discountPercent) / 100;
   const grandTotal = Math.max(itemsTotal - discountValue, 0);
 
   const paidValue = partialPayment ? Number(form.paid_amount) || 0 : grandTotal;
@@ -1073,102 +1139,52 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
     (p: Patient) => String(p.id) === form.patient_id
   );
 
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   mutate({
-  //     patient_id: Number(form.patient_id),
-  //     appointment_id: null,
-  //     type: form.type,
-  //     payment_method: form.payment_method,
-  //     doctor_id: requiresDoctor && form.doctor_id ? Number(form.doctor_id) : null,
-  //     nurse_id: allowsNurse && form.nurse_id ? Number(form.nurse_id) : null,
-  //     discount: discountValue,
-  //     ...(partialPayment ? { paid_amount: Number(form.paid_amount) || 0 } : {}),
-  //     notes: form.notes,
-  //     items: rows.flatMap((r) => {
-  //       // ===== خدمة =====
-  //       if (r.item_type === "service") {
-  //         const selected: SelectedServiceItem[] = r.service_items_ids ?? [];
-
-  //         // لو مفيش service_items مختارة → ابعت الخدمة الأم نفسها
-  //         if (selected.length === 0) {
-  //           return [
-  //             {
-  //               item_type: "service",
-  //               service_id: Number(r.service_id),
-  //               product_id: null,
-  //               quantity: 1,
-  //             },
-  //           ];
-  //         }
-
-  //         // لو فيه مختارة → كل واحدة تبقى item مستقل
-  //         return selected.map((x) => ({
-  //           item_type: "service",
-  //           service_id: Number(x.service_item_id),
-  //           product_id: null,
-  //           quantity: 1,
-  //         }));
-  //       }
-
-  //       // ===== منتج =====
-  //       return [
-  //         {
-  //           item_type: "product",
-  //           service_id: null,
-  //           product_id: Number(r.product_id),
-  //           quantity: Number(r.quantity),
-  //         },
-  //       ];
-  //     }),
-  //   });
-  // };
-
   const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
-  mutate({
-    patient_id: Number(form.patient_id),
-    appointment_id: null,
-    type: form.type,
-    payment_method: form.payment_method,
-    doctor_id: requiresDoctor && form.doctor_id ? Number(form.doctor_id) : null,
-    nurse_id: allowsNurse && form.nurse_id ? Number(form.nurse_id) : null,
-    discount: discountValue,
-    ...(partialPayment ? { paid_amount: Number(form.paid_amount) || 0 } : {}),
-    notes: form.notes,
-    items: rows.flatMap((r) => {
-      // ===== خدمة =====
-      if (r.item_type === "service") {
-        const selected: SelectedServiceItem[] = r.service_items_ids ?? [];
+    e.preventDefault();
+    mutate({
+      patient_id: Number(form.patient_id),
+      appointment_id: null,
+      type: form.type,
+      payment_method: form.payment_method,
+      doctor_id: requiresDoctor && form.doctor_id ? Number(form.doctor_id) : null,
+      nurse_id: allowsNurse && form.nurse_id ? Number(form.nurse_id) : null,
+      discount: discountValue,
+      ...(partialPayment ? { paid_amount: Number(form.paid_amount) || 0 } : {}),
+      notes: form.notes,
+      items: rows.flatMap((r) => {
+        // ===== خدمة =====
+        if (r.item_type === "service") {
+          const selected: SelectedServiceItem[] = r.service_items_ids ?? [];
 
-        // ✅ نبعت صف واحد بس للخدمة
-        // - service_id = id الخدمة الأم
-        // - service_items_ids = array من service_item_id المختارة
+          // ✅ نبعت صف واحد بس للخدمة
+          // - service_id = id الخدمة الأم
+          // - service_items_ids = array من service_item_id المختارة
+          return [
+            {
+              item_type: "service",
+              service_id: Number(r.service_id),
+              product_id: null,
+              quantity: 1,
+              ...(selected.length > 0
+                ? { service_items_ids: selected.map((x) => Number(x.service_item_id)) }
+                : {}),
+            },
+          ];
+        }
+
+        // ===== منتج =====
         return [
           {
-            item_type: "service",
-            service_id: Number(r.service_id),
-            product_id: null,
-            quantity: 1,
-            ...(selected.length > 0
-              ? { service_items_ids: selected.map((x) => Number(x.service_item_id)) }
-              : {}),
+            item_type: "product",
+            service_id: null,
+            product_id: Number(r.product_id),
+            quantity: Number(r.quantity),
           },
         ];
-      }
+      }),
+    });
+  };
 
-      // ===== منتج =====
-      return [
-        {
-          item_type: "product",
-          service_id: null,
-          product_id: Number(r.product_id),
-          quantity: Number(r.quantity),
-        },
-      ];
-    }),
-  });
-};
   return (
     <>
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-5 xl:grid-cols-2">
@@ -1577,6 +1593,22 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
               ملخص الفاتورة والدفع
             </h2>
 
+            {/* ✅ الخصم بالنسبة المئوية (بحد أقصى 20%) */}
+            <TextField
+              label={`الخصم (%) — الحد الأقصى ${MAX_DISCOUNT_PERCENT}%`}
+              name="discount"
+              type="number"
+              min={0}
+              max={MAX_DISCOUNT_PERCENT}
+              value={form.discount}
+              onChange={(e) => {
+                const raw = Number(e.target.value) || 0;
+                const clamped = Math.min(Math.max(raw, 0), MAX_DISCOUNT_PERCENT);
+                setForm({ ...form, discount: String(clamped) });
+              }}
+              placeholder={`مثال: 10 (بحد أقصى ${MAX_DISCOUNT_PERCENT})`}
+            />
+
             <label className="flex items-center gap-2 text-sm font-bold text-ink">
               <input
                 type="checkbox"
@@ -1613,7 +1645,9 @@ const InvoiceCreateForm = ({ onSuccess, onCancel }: InvoiceCreateFormProps) => {
                 <span className="font-bold text-ink">{itemsTotal.toFixed(2)} ج.م</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="font-bold text-ink/55">الخصم</span>
+                <span className="font-bold text-ink/55">
+                  الخصم ({discountPercent}%)
+                </span>
                 <span className="font-bold text-coral-600">
                   - {discountValue.toFixed(2)} ج.م
                 </span>

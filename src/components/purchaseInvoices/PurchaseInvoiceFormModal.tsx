@@ -34,7 +34,7 @@ const PurchaseInvoiceFormModal = ({ open, onClose }: Props) => {
 
   const { data: itemData } = useFetch<{ data: Item[] }>({
     queryKey: ["items"],
-    endpoint: "items",
+    endpoint: "items?per_page=-1",
     enabled: open,
   });
   const items = itemData?.data ?? (Array.isArray(itemData) ? (itemData as any) : []);

@@ -41,7 +41,7 @@ const PurchaseInvoiceDetailsModal = ({ open, onClose, invoiceId }: Props) => {
               <tbody>
                 {invoice.items?.map((it: any, idx: number) => (
                   <tr key={idx}>
-                    <td>{it.item?.name ?? `#${it.item_id}`}</td>
+                    <td>{it.item?.item_name ?? `${it.item_name}`}</td>
                     <td>{it.quantity}</td>
                     <td>{it.purchase_price} ج.م</td>
                     <td className="font-bold text-primary-600">
