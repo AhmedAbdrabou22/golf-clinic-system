@@ -1,5 +1,8 @@
 
 
+
+
+
 // import { useEffect, useMemo, useState } from "react";
 // import { useNavigate, useParams } from "react-router-dom";
 // import { FiPlus, FiTrash2, FiLock, FiCheckCircle, FiArrowRight } from "react-icons/fi";
@@ -153,6 +156,9 @@
 //   const [deptRows, setDeptRows] = useState<(DepartmentCommission & { _key: number })[]>([]);
 //   const [serviceRows, setServiceRows] = useState<(ServiceCommission & { _key: number })[]>([]);
 //   const [existingContract, setExistingContract] = useState<Contract | null>(null);
+
+//   // ✅ لو الموظف محقق التارجت → نخفي checkbox التفعيل وحقوله بالكامل
+//   const achievedTarget = form.achieved_target;
 
 //   // ✅ أنماط الدكتور (الموجودة + الجديد لو مش متضاف في constants)
 //   const doctorModeOptions = useMemo(() => {
@@ -480,15 +486,7 @@
 //       } else if (doctorMode === "target_escalation") {
 //         Object.assign(base, {
 //           hourly_rate: contractForm.hourly_rate,
-//           has_target: contractForm.has_target,
-//           target_amount: num(contractForm.target_amount),
-//           target_type: "doctor_income", // ✅ ثابت — مخفي في الفورم
-//           target_achieved_hourly_rate: num(contractForm.target_achieved_hourly_rate),
-//           target_achieved_laser_percentage: num(contractForm.target_achieved_laser_percentage),
-//           target_achieved_other_percentage: num(contractForm.target_achieved_other_percentage),
-//           target_bonus: num(contractForm.target_bonus) ?? 0,
 //           other_service_commission_percentage: num(contractForm.other_service_commission_percentage),
-
 //           service_commissions: serviceRows.map(
 //             ({ service_id, doctor_service_price, is_laser, commission_type, commission_value }) => ({
 //               service_id: Number(service_id),
@@ -501,6 +499,21 @@
 //             })
 //           ),
 //         });
+
+//         // ✅ لو الموظف محقق التارجت: الـ checkbox وحقوله مخفية، فمنبعتش بيانات التارجت
+//         if (achievedTarget) {
+//           base.has_target = false;
+//         } else {
+//           Object.assign(base, {
+//             has_target: contractForm.has_target,
+//             target_amount: num(contractForm.target_amount),
+//             target_type: "doctor_income", // ✅ ثابت — مخفي في الفورم
+//             target_achieved_hourly_rate: num(contractForm.target_achieved_hourly_rate),
+//             target_achieved_laser_percentage: num(contractForm.target_achieved_laser_percentage),
+//             target_achieved_other_percentage: num(contractForm.target_achieved_other_percentage),
+//             target_bonus: num(contractForm.target_bonus) ?? 0,
+//           });
+//         }
 //       } else if (doctorMode === "fixed_plus_medication") {
 //         // ✅ النمط الجديد: medication_commission_type + medication_commission_value
 //         Object.assign(base, buildDoctorMedicationPayload());
@@ -705,10 +718,10 @@
 //                 checked={form.is_active}
 //                 onChange={(e) => setForm({ ...form, is_active: e.target.checked })}
 //               />
-//                <CheckboxField
-//                  label="حقق التارجت؟"
-//                  name="achieved_target"
-//                  checked={form.achieved_target}
+//               <CheckboxField
+//                 label="حقق التارجت؟"
+//                 name="achieved_target"
+//                 checked={form.achieved_target}
 //                 onChange={(e) => setForm({ ...form, achieved_target: e.target.checked })}
 //               />
 //             </div>
@@ -1170,81 +1183,86 @@
 //                       </button>
 //                     </div>
 
-//                     <label className="flex items-center gap-2 text-sm font-bold text-ink">
-//                       <input
-//                         type="checkbox"
-//                         className="h-4 w-4 rounded border-ink/20 text-primary-600"
-//                         checked={contractForm.has_target}
-//                         onChange={(e) =>
-//                           setContractForm({ ...contractForm, has_target: e.target.checked })
-//                         }
-//                       />
-//                       تفعيل نظام التارجت والتصعيد
-//                     </label>
+//                     {/* ✅ checkbox التارجت وحقوله مخفية بالكامل لو الموظف محقق التارجت */}
+//                     {!achievedTarget && (
+//                       <>
+//                         <label className="flex items-center gap-2 text-sm font-bold text-ink">
+//                           <input
+//                             type="checkbox"
+//                             className="h-4 w-4 rounded border-ink/20 text-primary-600"
+//                             checked={contractForm.has_target}
+//                             onChange={(e) =>
+//                               setContractForm({ ...contractForm, has_target: e.target.checked })
+//                             }
+//                           />
+//                           تفعيل نظام التارجت والتصعيد
+//                         </label>
 
-//                     {contractForm.has_target && (
-//                       <div className="grid grid-cols-2 gap-4 rounded-xl bg-paper p-4">
-//                         <TextField
-//                           label="قيمة التارجت (ج.م)"
-//                           name="target_amount"
-//                           type="number"
-//                           step="0.01"
-//                           value={contractForm.target_amount}
-//                           onChange={(e) =>
-//                             setContractForm({ ...contractForm, target_amount: e.target.value })
-//                           }
-//                         />
+//                         {contractForm.has_target && (
+//                           <div className="grid grid-cols-2 gap-4 rounded-xl bg-paper p-4">
+//                             <TextField
+//                               label="قيمة التارجت (ج.م)"
+//                               name="target_amount"
+//                               type="number"
+//                               step="0.01"
+//                               value={contractForm.target_amount}
+//                               onChange={(e) =>
+//                                 setContractForm({ ...contractForm, target_amount: e.target.value })
+//                               }
+//                             />
 
-//                         <TextField
-//                           label="سعر الساعة بعد التارجت"
-//                           name="target_achieved_hourly_rate"
-//                           type="number"
-//                           step="0.01"
-//                           value={contractForm.target_achieved_hourly_rate}
-//                           onChange={(e) =>
-//                             setContractForm({
-//                               ...contractForm,
-//                               target_achieved_hourly_rate: e.target.value,
-//                             })
-//                           }
-//                         />
-//                         <TextField
-//                           label="نسبة الليزر بعد التارجت (%)"
-//                           name="target_achieved_laser_percentage"
-//                           type="number"
-//                           step="0.01"
-//                           value={contractForm.target_achieved_laser_percentage}
-//                           onChange={(e) =>
-//                             setContractForm({
-//                               ...contractForm,
-//                               target_achieved_laser_percentage: e.target.value,
-//                             })
-//                           }
-//                         />
-//                         <TextField
-//                           label="نسبة باقي الخدمات بعد التارجت (%)"
-//                           name="target_achieved_other_percentage"
-//                           type="number"
-//                           step="0.01"
-//                           value={contractForm.target_achieved_other_percentage}
-//                           onChange={(e) =>
-//                             setContractForm({
-//                               ...contractForm,
-//                               target_achieved_other_percentage: e.target.value,
-//                             })
-//                           }
-//                         />
-//                         <TextField
-//                           label="بونص تحقيق التارجت (ج.م)"
-//                           name="target_bonus"
-//                           type="number"
-//                           step="0.01"
-//                           value={contractForm.target_bonus}
-//                           onChange={(e) =>
-//                             setContractForm({ ...contractForm, target_bonus: e.target.value })
-//                           }
-//                         />
-//                       </div>
+//                             <TextField
+//                               label="سعر الساعة بعد التارجت"
+//                               name="target_achieved_hourly_rate"
+//                               type="number"
+//                               step="0.01"
+//                               value={contractForm.target_achieved_hourly_rate}
+//                               onChange={(e) =>
+//                                 setContractForm({
+//                                   ...contractForm,
+//                                   target_achieved_hourly_rate: e.target.value,
+//                                 })
+//                               }
+//                             />
+//                             <TextField
+//                               label="نسبة الليزر بعد التارجت (%)"
+//                               name="target_achieved_laser_percentage"
+//                               type="number"
+//                               step="0.01"
+//                               value={contractForm.target_achieved_laser_percentage}
+//                               onChange={(e) =>
+//                                 setContractForm({
+//                                   ...contractForm,
+//                                   target_achieved_laser_percentage: e.target.value,
+//                                 })
+//                               }
+//                             />
+//                             <TextField
+//                               label="نسبة باقي الخدمات بعد التارجت (%)"
+//                               name="target_achieved_other_percentage"
+//                               type="number"
+//                               step="0.01"
+//                               value={contractForm.target_achieved_other_percentage}
+//                               onChange={(e) =>
+//                                 setContractForm({
+//                                   ...contractForm,
+//                                   target_achieved_other_percentage: e.target.value,
+//                                 })
+//                               }
+//                             />
+//                             <TextField
+//                               label="بونص تحقيق التارجت (ج.م)"
+//                               name="target_bonus"
+//                               type="number"
+//                               step="0.01"
+//                               value={contractForm.target_bonus}
+//                               onChange={(e) =>
+//                                 setContractForm({ ...contractForm, target_bonus: e.target.value })
+//                               }
+//                             />
+//                           </div>
+//                         )}
+//                       </>
 //                     )}
 //                   </>
 //                 )}
@@ -1275,8 +1293,6 @@
 // };
 
 // export default StaffContractFormPage;
-
-
 
 
 import { useEffect, useMemo, useState } from "react";
@@ -1310,6 +1326,28 @@ type DoctorMode =
   | "flat_percentage"
   | "target_escalation"
   | "fixed_plus_medication";
+
+// ✅ شكل الخطة كما يرجعها GET /commission-templates
+interface TemplateItemPreview {
+  id: number;
+  service_id: number;
+  service_name?: string;
+  doctor_service_price: number;
+  is_laser: boolean;
+  commission_type: string;
+  commission_value: number;
+  target_commission_value: number;
+}
+
+interface CommissionTemplateOption {
+  id: number;
+  name: string;
+  department_id: number;
+  department_name?: string;
+  is_active: boolean;
+  items_count?: number;
+  items?: TemplateItemPreview[];
+}
 
 const FIXED_PLUS_MEDICATION_MODE = {
   value: "fixed_plus_medication",
@@ -1366,6 +1404,9 @@ const detectDoctorMode = (contract: Contract | null): DoctorMode => {
   const n = (v: any) => Number(v ?? 0) || 0;
   const services: any[] = c.service_commissions ?? [];
 
+  // ✅ العقد المربوط بخطة عمولات = نسب + تارجت وتصعيد
+  const hasTemplate = !!(c.commission_template_id ?? c.commission_template?.id);
+
   // ✅ أي علامة من علامات "نسب + تارجت وتصعيد"
   const hasTargetData =
     !!c.has_target ||
@@ -1381,7 +1422,7 @@ const detectDoctorMode = (contract: Contract | null): DoctorMode => {
     (s) => !!s.is_laser || n(s.doctor_service_price) > 0
   );
 
-  if (hasTargetData || hasEscalationServices) return "target_escalation";
+  if (hasTemplate || hasTargetData || hasEscalationServices) return "target_escalation";
 
   // خدمات من غير بيانات تصعيد → سعر ثابت لكل خدمة
   if (services.length > 0) return "fixed_per_service";
@@ -1433,6 +1474,9 @@ const StaffContractFormPage = () => {
   const [serviceRows, setServiceRows] = useState<(ServiceCommission & { _key: number })[]>([]);
   const [existingContract, setExistingContract] = useState<Contract | null>(null);
 
+  // ✅ خطة العمولات المختارة (نمط التصعيد)
+  const [templateId, setTemplateId] = useState<number | null>(null);
+
   // ✅ لو الموظف محقق التارجت → نخفي checkbox التفعيل وحقوله بالكامل
   const achievedTarget = form.achieved_target;
 
@@ -1456,7 +1500,7 @@ const StaffContractFormPage = () => {
   });
   const staff: Staff | null = staffResp?.data ?? (staffResp?.id ? staffResp : null);
 
-  // ✅ قسم الطبيب — بنستخدمه لفلترة الخدمات
+  // ✅ قسم الطبيب — بنستخدمه لفلترة الخدمات والخطط
   const doctorDepartmentId = staff?.department_id ?? null;
 
   useEffect(() => {
@@ -1497,7 +1541,7 @@ const StaffContractFormPage = () => {
     enabled: contractUnlocked,
   });
 
-  // ===== جلب الخدمات (مفلترة حسب قسم الطبيب) =====
+  // ===== جلب الخدمات (نمط "عمولة ثابتة لكل خدمة" فقط) =====
   const { data: servicesData } = useFetch<any>({
     queryKey: ["services-list", doctorDepartmentId],
     endpoint: "services",
@@ -1509,7 +1553,7 @@ const StaffContractFormPage = () => {
       tab === "contract" &&
       contractType === "doctor" &&
       !!doctorDepartmentId &&
-      (doctorMode === "fixed_per_service" || doctorMode === "target_escalation"),
+      doctorMode === "fixed_per_service",
   });
   const servicesList: any[] = servicesData?.data ?? (Array.isArray(servicesData) ? servicesData : []);
   const serviceOptions = useMemo(
@@ -1517,11 +1561,36 @@ const StaffContractFormPage = () => {
     [servicesList]
   );
 
-  // ✅ helper: يرجع سعر الخدمة من الـ list
-  const getServicePrice = (serviceId: number): number => {
-    const found = servicesList.find((s: any) => Number(s.id) === Number(serviceId));
-    return Number(found?.price ?? found?.cost ?? 0);
-  };
+  // ===== جلب خطط العمولات (نمط التصعيد فقط) =====
+  const { data: templatesData } = useFetch<any>({
+    queryKey: ["commission-templates", "select"],
+    endpoint: "commission-templates",
+    params: { per_page: 100 },
+    enabled: tab === "contract" && contractType === "doctor" && doctorMode === "target_escalation",
+  });
+  const templatesList: CommissionTemplateOption[] =
+    templatesData?.data ?? (Array.isArray(templatesData) ? templatesData : []);
+
+  // ✅ الخطط الفعالة الخاصة بقسم الطبيب (+ الخطة المختارة حاليًا حتى لو بقت غير فعالة)
+  const templateOptions = useMemo(
+    () =>
+      templatesList
+        .filter(
+          (t) =>
+            (t.is_active || t.id === templateId) &&
+            (!doctorDepartmentId || Number(t.department_id) === Number(doctorDepartmentId))
+        )
+        .map((t) => ({
+          value: String(t.id),
+          label: `${t.name} (${t.items_count ?? t.items?.length ?? 0} خدمة)`,
+        })),
+    [templatesList, templateId, doctorDepartmentId]
+  );
+
+  const selectedTemplate = useMemo(
+    () => templatesList.find((t) => t.id === templateId) ?? null,
+    [templatesList, templateId]
+  );
 
   useEffect(() => {
     if (!staffId) return;
@@ -1549,6 +1618,7 @@ const StaffContractFormPage = () => {
       setDoctorMode("");
       setDeptRows([]);
       setServiceRows([]);
+      setTemplateId(null);
       return;
     }
 
@@ -1600,6 +1670,12 @@ const StaffContractFormPage = () => {
       target_bonus: found.target_bonus != null ? String(found.target_bonus) : "",
     });
     setDoctorMode(detectDoctorMode(found));
+
+    // ✅ الخطة المربوطة بالعقد (لو موجودة)
+    const linkedTemplateId =
+      (found as any).commission_template_id ?? (found as any).commission_template?.id ?? null;
+    setTemplateId(linkedTemplateId != null ? Number(linkedTemplateId) : null);
+
     setDeptRows(found.department_commissions?.map((d) => ({ ...d, _key: Math.random() })) ?? []);
     setServiceRows(
       found.service_commissions?.map((s) => ({
@@ -1690,13 +1766,9 @@ const StaffContractFormPage = () => {
       return;
     }
 
-    // ✅ validation: نمط التصعيد لازم فيه خدمة واحدة على الأقل
-    if (
-      contractType === "doctor" &&
-      doctorMode === "target_escalation" &&
-      serviceRows.length === 0
-    ) {
-      alert("لازم تضيف خدمة واحدة على الأقل في نمط نسب + تارجت وتصعيد");
+    // ✅ validation: نمط التصعيد لازم فيه خطة عمولات
+    if (contractType === "doctor" && doctorMode === "target_escalation" && !templateId) {
+      alert("لازم تختار خطة العمولات في نمط نسب + تارجت وتصعيد");
       return;
     }
 
@@ -1760,20 +1832,11 @@ const StaffContractFormPage = () => {
           default_service_commission_value: num(contractForm.default_service_commission_value),
         });
       } else if (doctorMode === "target_escalation") {
+        // ✅ الخدمات بتيجي من الخطة — بنبعت بس commission_template_id
         Object.assign(base, {
-          hourly_rate: contractForm.hourly_rate,
+          hourly_rate: num(contractForm.hourly_rate),
           other_service_commission_percentage: num(contractForm.other_service_commission_percentage),
-          service_commissions: serviceRows.map(
-            ({ service_id, doctor_service_price, is_laser, commission_type, commission_value }) => ({
-              service_id: Number(service_id),
-              doctor_service_price: is_laser
-                ? Number(doctor_service_price) || 0
-                : getServicePrice(Number(service_id)),
-              is_laser: true,
-              commission_type,
-              commission_value: Number(commission_value) || 0,
-            })
-          ),
+          commission_template_id: templateId,
         });
 
         // ✅ لو الموظف محقق التارجت: الـ checkbox وحقوله مخفية، فمنبعتش بيانات التارجت
@@ -2335,128 +2398,69 @@ const StaffContractFormPage = () => {
                       />
                     </div>
 
+                    {/* ✅ اختيار خطة العمولات بدل صفوف الخدمات */}
                     <div className="flex flex-col gap-2 rounded-xl border border-ink/10 p-4">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-bold text-ink">الخدمات المشمولة بالعمولة</p>
+                        <p className="text-sm font-bold text-ink">خطة العمولات</p>
                         <p className="text-xs text-ink/40">
-                          سعر المحاسبة = السعر اللي الطبيب بيتحاسب عليه (مش سعر الفاتورة)
+                          الخدمات ونسبها بتيجي من الخطة المختارة
                         </p>
                       </div>
 
                       {!doctorDepartmentId ? (
                         <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                          ⚠️ الطبيب مش متسجل في قسم — لازم تحدد القسم في تبويب "بيانات الموظف" الأول عشان تقدر تختار الخدمات.
+                          ⚠️ الطبيب مش متسجل في قسم — لازم تحدد القسم في تبويب "بيانات الموظف" الأول عشان تقدر تختار الخطة.
                         </p>
-                      ) : serviceRows.length === 0 ? (
+                      ) : templateOptions.length === 0 ? (
                         <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-                          لازم تضيف خدمة واحدة على الأقل.
+                          مفيش خطط فعالة لقسم الطبيب — أضف خطة من صفحة "خطط العمولات" الأول.
                         </p>
                       ) : null}
 
-                      {serviceRows.map((row, idx) => {
-                        const doctorPrice = Number(row.doctor_service_price ?? 0);
+                      <SearchableSelect
+                        label="الخطة"
+                        value={templateId}
+                        onChange={(val) => setTemplateId(val ? Number(val) : null)}
+                        options={templateOptions}
+                        placeholder="ابحث عن خطة..."
+                      />
 
-                        return (
-                          <div
-                            key={row._key}
-                            className="flex flex-wrap items-end gap-2 rounded-lg border border-ink/10 p-2"
-                          >
-                            <div className="min-w-[180px] flex-1">
-                              <SearchableSelect
-                                label="الخدمة"
-                                value={row.service_id || null}
-                                onChange={(val) => {
-                                  const next = [...serviceRows];
-                                  const newServiceId = Number(val);
-                                  const newServicePrice = getServicePrice(newServiceId);
-                                  next[idx] = {
-                                    ...row,
-                                    service_id: newServiceId,
-                                    doctor_service_price: row.is_laser
-                                      ? row.doctor_service_price
-                                      : newServicePrice,
-                                  };
-                                  setServiceRows(next);
-                                }}
-                                options={serviceOptions}
-                                placeholder="ابحث عن خدمة..."
-                              />
-                            </div>
-
-                            <div className="w-32">
-                              <TextField
-                                label="سعر محاسبة الطبيب"
-                                name={`service_price_${idx}`}
-                                type="number"
-                                step="0.01"
-                                value={String(doctorPrice)}
-                                onChange={(e) => {
-                                  const next = [...serviceRows];
-                                  next[idx] = {
-                                    ...row,
-                                    doctor_service_price: Number(e.target.value),
-                                  };
-                                  setServiceRows(next);
-                                }}
-                              />
-                            </div>
-
-                            <div className="w-32">
-                              <SelectField
-                                label="نوع العمولة"
-                                name={`service_type_${idx}`}
-                                value={row.commission_type}
-                                onChange={(e) => {
-                                  const next = [...serviceRows];
-                                  next[idx] = {
-                                    ...row,
-                                    commission_type: e.target.value as ServiceCommissionType,
-                                  };
-                                  setServiceRows(next);
-                                }}
-                                options={SERVICE_COMMISSION_TYPES}
-                              />
-                            </div>
-
-                            <div className="w-24">
-                              <TextField
-                                label="القيمة"
-                                name={`service_value_${idx}`}
-                                type="number"
-                                step="0.01"
-                                value={String(row.commission_value || "")}
-                                onChange={(e) => {
-                                  const next = [...serviceRows];
-                                  next[idx] = {
-                                    ...row,
-                                    commission_value: Number(e.target.value),
-                                  };
-                                  setServiceRows(next);
-                                }}
-                              />
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() =>
-                                setServiceRows(serviceRows.filter((_, i) => i !== idx))
-                              }
-                              className="mb-1 rounded-lg p-2.5 text-coral-500 hover:bg-coral-500/10"
-                            >
-                              <FiTrash2 size={16} />
-                            </button>
-                          </div>
-                        );
-                      })}
-
-                      <button
-                        type="button"
-                        disabled={!doctorDepartmentId}
-                        onClick={() => setServiceRows([...serviceRows, emptyServiceRow()])}
-                        className="btn-secondary self-start disabled:opacity-40"
-                      >
-                        <FiPlus size={15} /> إضافة خدمة
-                      </button>
+                      {/* معاينة بنود الخطة (قراءة فقط) */}
+                      {selectedTemplate && (selectedTemplate.items?.length ?? 0) > 0 && (
+                        <div className="overflow-x-auto rounded-lg border border-ink/10">
+                          <table className="w-full text-xs">
+                            <thead>
+                              <tr className="border-b border-ink/10 bg-paper text-right text-ink/50">
+                                <th className="px-3 py-2 font-bold">الخدمة</th>
+                                <th className="px-3 py-2 font-bold">سعر المحاسبة</th>
+                                <th className="px-3 py-2 font-bold">القيمة</th>
+                                <th className="px-3 py-2 font-bold">بعد التارجت</th>
+                                <th className="px-3 py-2 font-bold">ليزر</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {selectedTemplate.items?.map((item) => {
+                                const unit = item.commission_type === "percentage" ? "%" : "ج.م";
+                                return (
+                                  <tr key={item.id} className="border-b border-ink/5 last:border-0">
+                                    <td className="px-3 py-2 font-bold text-ink">
+                                      {item.service_name ?? `خدمة #${item.service_id}`}
+                                    </td>
+                                    <td className="px-3 py-2">{item.doctor_service_price}</td>
+                                    <td className="px-3 py-2">
+                                      {item.commission_value} {unit}
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      {item.target_commission_value} {unit}
+                                    </td>
+                                    <td className="px-3 py-2">{item.is_laser ? "نعم" : "لا"}</td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
                     </div>
 
                     {/* ✅ checkbox التارجت وحقوله مخفية بالكامل لو الموظف محقق التارجت */}
