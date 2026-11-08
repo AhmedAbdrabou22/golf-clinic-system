@@ -2563,7 +2563,7 @@ const StaffContractFormPage = () => {
               </button>
               <button type="submit" disabled={savingContract || !contractType} className="btn-primary flex-1">
                 {savingContract ? "جاري الحفظ..." : isEditContract ? "حفظ تعديل العقد" : "حفظ العقد"}
-              </button>
+              </button> 
             </div>
           </form>
         )}
