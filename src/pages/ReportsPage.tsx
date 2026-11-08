@@ -34,7 +34,7 @@ const ReportsPage = () => {
         </button>
       </div>
 
-      {/* <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {REPORTS_LIST.map((r) => (
           <button
             key={r.key}
@@ -51,7 +51,7 @@ const ReportsPage = () => {
             </span>
           </button>
         ))}
-      </div> */}
+      </div>
     </div>
   );
 };

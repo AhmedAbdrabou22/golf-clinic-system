@@ -38,6 +38,8 @@ import PatientProfilePage from "./components/patients/PatientProfilePage";
 import OffersPage from "./pages/OffersPage";
 import ReportsDashboardPage from "./pages/ReportsDashboardPage";
 import NewFinancialReportPage from "./pages/NewFinancialReportPage";
+import CommissionTemplatesPage from "./pages/Commissiontemplatespage";
+import CommissionTemplateFormPage from "./pages/Commissiontemplateformpage";
 
 
 // دالة صغيرة تلف الصفحة بالصلاحية المطلوبة
@@ -68,6 +70,9 @@ function App() {
             <Route path="/staff/:id/edit" element={guard("update staff", <StaffContractFormPage />)} />
             <Route path="/contracts" element={guard("read staff_contracts", <ContractsPage />)} />
             <Route path="/payrolls" element={guard("read payrolls", <PayrollsPage />)} />
+            <Route path="/commission-templates" element={<CommissionTemplatesPage />} />
+            <Route path="/commission-templates/new" element={<CommissionTemplateFormPage />} />
+            <Route path="/commission-templates/:id/edit" element={<CommissionTemplateFormPage />} />
 
             {/* الإدارة */}
             <Route path="/roles" element={guard("read roles", <RolesPage />)} />
@@ -78,10 +83,10 @@ function App() {
 
             {/* التقارير */}
             <Route path="/reports" element={guard("read reports", <ReportsPage />)} />
-            <Route path="/reports/financial-shift-report" element={guard("read reports", <NewFinancialReportPage />)}/>
+            <Route path="/reports/financial-shift-report" element={guard("read reports", <NewFinancialReportPage />)} />
 
             <Route path="/reports/:key" element={guard("read reports", <ReportDetailPage />)} />
-
+        
             {/* العيادة */}
             <Route path="/reception" element={guard("read appointments", <ReceptionPage />)} />
             <Route path="/appointments" element={guard("read appointments", <AppointmentsPage />)} />
