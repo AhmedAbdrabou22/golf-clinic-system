@@ -265,7 +265,7 @@ const ReportsDashboardPage = () => {
 
           <div className="grid gap-4 lg:grid-cols-3">
             <div className="card p-4">
-              <h4 className="mb-3 font-extrabold">نبض اليوم</h4>
+              <h4 className="mb-3 font-extrabold">ملخص الاجمالي لليوم</h4>
               <Row label="التاريخ" value={pulse?.today_date ?? "-"} />
               <Row label="المواعيد" value={String(pulse?.today_appointments_count ?? 0)} />
               <Row label="الفواتير" value={String(pulse?.today_invoices_count ?? 0)} />
